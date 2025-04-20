@@ -103,6 +103,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to login');
       toast.error(err instanceof Error ? err.message : 'Failed to login');
+      throw err; // Rethrow for component to handle
     } finally {
       setIsLoading(false);
     }
@@ -137,8 +138,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             totalRides: 0,
             rating: 5.0
           };
-          // Add to simulated DB (optional, not needed for this implementation)
-          // driversDB.push(authenticatedDriver);
         }
         
         setDriver(authenticatedDriver);
@@ -153,7 +152,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to verify OTP');
       toast.error(err instanceof Error ? err.message : 'Failed to verify OTP');
-      return false;
+      throw err; // Rethrow for component to handle
     } finally {
       setIsLoading(false);
     }

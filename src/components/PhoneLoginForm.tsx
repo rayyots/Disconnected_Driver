@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { Phone, KeyRound } from 'lucide-react';
+import { Phone, KeyRound, Loader } from 'lucide-react';
 import { 
   InputOTP,
   InputOTPGroup,
@@ -50,9 +50,10 @@ const PhoneLoginForm: React.FC = () => {
       
       setPhoneNumber(values.phone);
       await login(values.phone);
-      setOtpSent(true);
+      setOtpSent(true); // Important: This must happen after login completes successfully
     } catch (err) {
       // Error is already handled in AuthContext
+      console.error('Login error:', err);
     }
   };
 
@@ -68,14 +69,17 @@ const PhoneLoginForm: React.FC = () => {
       await verifyOTP(otpValue);
     } catch (err) {
       // Error is already handled in AuthContext
+      console.error('OTP verification error:', err);
     }
   };
 
   const handleResendOTP = async () => {
     try {
       await login(phoneNumber);
+      toast.success('OTP resent to your phone');
     } catch (err) {
       // Error is already handled in AuthContext
+      console.error('Resend OTP error:', err);
     }
   };
 
@@ -127,7 +131,12 @@ const PhoneLoginForm: React.FC = () => {
               className="w-full bg-[#00C4CC] hover:bg-[#00A8AF] text-white font-medium"
               disabled={isLoading}
             >
-              {isLoading ? 'Sending OTP...' : 'Send OTP'}
+              {isLoading ? (
+                <>
+                  <Loader className="h-4 w-4 animate-spin mr-2" /> 
+                  Sending OTP...
+                </>
+              ) : 'Send OTP'}
             </Button>
 
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
@@ -184,7 +193,12 @@ const PhoneLoginForm: React.FC = () => {
             className="w-full bg-[#00C4CC] hover:bg-[#00A8AF] text-white font-medium"
             disabled={isLoading}
           >
-            {isLoading ? 'Verifying...' : 'Verify OTP'}
+            {isLoading ? (
+              <>
+                <Loader className="h-4 w-4 animate-spin mr-2" /> 
+                Verifying...
+              </>
+            ) : 'Verify OTP'}
           </Button>
           
           {/* Hidden in production, just for testing */}

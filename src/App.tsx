@@ -54,20 +54,7 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const AppRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/auth" element={<AuthRoute><AuthPage /></AuthRoute>} />
-      
-      <Route path="/" element={<ProtectedRoute><RideProvider><HomePage /></RideProvider></ProtectedRoute>} />
-      <Route path="/earnings" element={<ProtectedRoute><RideProvider><EarningsPage /></RideProvider></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-};
-
+// We need to move AppRoutes inside the AuthProvider to fix the error
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -75,7 +62,37 @@ const App = () => (
       <Sonner position="top-right" />
       <BrowserRouter>
         <AuthProvider>
-          <AppRoutes />
+          <Routes>
+            <Route path="/auth" element={
+              <AuthRoute>
+                <AuthPage />
+              </AuthRoute>
+            } />
+            
+            <Route path="/" element={
+              <ProtectedRoute>
+                <RideProvider>
+                  <HomePage />
+                </RideProvider>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/earnings" element={
+              <ProtectedRoute>
+                <RideProvider>
+                  <EarningsPage />
+                </RideProvider>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
