@@ -1,8 +1,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
-// Driver type
+// Driver type definition
 export interface Driver {
   id: string;
   name: string;
@@ -18,21 +19,37 @@ export interface Driver {
   rating: number;
 }
 
-// Mock driver data (simulating Firebase response)
-const mockDriver: Driver = {
-  id: 'driver-123',
-  name: 'John Driver',
-  phone: '+1234567890',
-  isOnline: false,
-  carDetails: {
-    model: 'Toyota Camry',
-    color: 'Black',
-    plateNumber: 'ABC-1234',
+// Simulated database of drivers
+const driversDB: Driver[] = [
+  {
+    id: 'driver-123',
+    name: 'John Driver',
+    phone: '+1234567890',
+    isOnline: false,
+    carDetails: {
+      model: 'Toyota Camry',
+      color: 'Black',
+      plateNumber: 'ABC-1234',
+    },
+    earnings: 1250.75,
+    totalRides: 45,
+    rating: 4.8,
   },
-  earnings: 1250.75,
-  totalRides: 45,
-  rating: 4.8,
-};
+  {
+    id: 'driver-124',
+    name: 'Sarah Smith',
+    phone: '+1987654321',
+    isOnline: false,
+    carDetails: {
+      model: 'Honda Civic',
+      color: 'Silver',
+      plateNumber: 'XYZ-9876',
+    },
+    earnings: 980.50,
+    totalRides: 32,
+    rating: 4.9,
+  }
+];
 
 interface AuthContextType {
   driver: Driver | null;
@@ -51,9 +68,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [driver, setDriver] = useState<Driver | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [pendingVerification, setPendingVerification] = useState<boolean>(false);
+  const [pendingPhone, setPendingPhone] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  // Check if we have a saved session
+  // Check for saved session
   useEffect(() => {
     const savedDriver = localStorage.getItem('disconnected_driver');
     
@@ -74,13 +92,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
       setError(null);
       
-      // Mock phone verification (In real app, this would call Firebase Auth)
-      // For demo purposes, we'll simulate an API call
+      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Check if phone is registered as a driver
-      if (phone === mockDriver.phone) {
-        setPendingVerification(true);
+      // Check if phone exists in our simulated database
+      const driverExists = driversDB.find(d => d.phone === phone);
+      
+      if (driverExists) {
+        setPendingPhone(phone);
         toast.success('OTP sent to your phone');
       } else {
         throw new Error('Phone number not registered as a driver');
@@ -98,31 +117,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
       setError(null);
       
-      // Mock OTP verification (In real app, this would call Firebase Auth)
-      // For demo purposes, we'll use any 6-digit code
+      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (otp.length === 6 && /^\d+$/.test(otp)) {
-        setDriver(mockDriver);
-        localStorage.setItem('disconnected_driver', JSON.stringify(mockDriver));
-        toast.success('Login successful');
-        return true;
-      } else {
-        throw new Error('Invalid OTP code');
+      if (otp.length === 6 && pendingPhone) {
+        const authenticatedDriver = driversDB.find(d => d.phone === pendingPhone);
+        
+        if (authenticatedDriver) {
+          setDriver(authenticatedDriver);
+          localStorage.setItem('disconnected_driver', JSON.stringify(authenticatedDriver));
+          setPendingPhone(null);
+          toast.success('Login successful');
+          navigate('/');
+          return true;
+        }
       }
+      
+      throw new Error('Invalid OTP code');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to verify OTP');
       toast.error(err instanceof Error ? err.message : 'Failed to verify OTP');
       return false;
     } finally {
       setIsLoading(false);
-      setPendingVerification(false);
     }
   };
 
   const logout = () => {
     setDriver(null);
     localStorage.removeItem('disconnected_driver');
+    navigate('/auth');
     toast.info('Logged out successfully');
   };
 

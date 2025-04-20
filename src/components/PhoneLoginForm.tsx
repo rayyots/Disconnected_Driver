@@ -34,11 +34,6 @@ const PhoneLoginForm: React.FC = () => {
     await verifyOTP(otp);
   };
 
-  // For demo purposes, auto-fill the mockDriver's phone number
-  const handleDemoFill = () => {
-    setPhone('+1234567890'); // This matches our mock driver in AuthContext
-  };
-
   if (!otpSent) {
     return (
       <form onSubmit={handlePhoneSubmit} className="space-y-4 w-full max-w-sm animate-fade-in">
@@ -62,14 +57,6 @@ const PhoneLoginForm: React.FC = () => {
           disabled={isLoading}
         >
           {isLoading ? 'Sending OTP...' : 'Send OTP'}
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          className="w-full text-[#00C4CC] border-[#00C4CC]"
-          onClick={handleDemoFill}
-        >
-          Fill Demo Number
         </Button>
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </form>
@@ -112,16 +99,6 @@ const PhoneLoginForm: React.FC = () => {
         disabled={isLoading}
       >
         Back to Phone Entry
-      </Button>
-      
-      {/* For demo purposes, auto-fill a valid OTP */}
-      <Button 
-        type="button" 
-        variant="outline" 
-        className="w-full text-[#00C4CC] border-[#00C4CC]"
-        onClick={() => setOtp('123456')}
-      >
-        Fill Demo OTP
       </Button>
       
       {error && <p className="text-red-500 text-sm">{error}</p>}
