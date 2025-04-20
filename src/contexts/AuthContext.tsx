@@ -92,18 +92,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoading(true);
       setError(null);
       
+      // Modified: Skip driver check to always accept any phone number
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Check if phone exists in our simulated database
-      const driverExists = driversDB.find(d => d.phone === phone);
+      // Always accept the phone number and proceed to OTP
+      setPendingPhone(phone);
+      toast.success('OTP sent to your phone');
       
-      if (driverExists) {
-        setPendingPhone(phone);
-        toast.success('OTP sent to your phone');
-      } else {
-        throw new Error('Phone number not registered as a driver');
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to login');
       toast.error(err instanceof Error ? err.message : 'Failed to login');
@@ -120,17 +116,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Modified: Accept any 6-digit OTP
       if (otp.length === 6 && pendingPhone) {
-        const authenticatedDriver = driversDB.find(d => d.phone === pendingPhone);
+        // If driver exists in DB, use that data
+        let authenticatedDriver = driversDB.find(d => d.phone === pendingPhone);
         
-        if (authenticatedDriver) {
-          setDriver(authenticatedDriver);
-          localStorage.setItem('disconnected_driver', JSON.stringify(authenticatedDriver));
-          setPendingPhone(null);
-          toast.success('Login successful');
-          navigate('/');
-          return true;
+        // If driver doesn't exist, create a new mock driver
+        if (!authenticatedDriver) {
+          authenticatedDriver = {
+            id: `driver-${Math.floor(Math.random() * 1000)}`,
+            name: "Test Driver",
+            phone: pendingPhone,
+            isOnline: false,
+            carDetails: {
+              model: "Test Car",
+              color: "Blue",
+              plateNumber: "TEST-123",
+            },
+            earnings: 0,
+            totalRides: 0,
+            rating: 5.0
+          };
+          // Add to simulated DB (optional, not needed for this implementation)
+          // driversDB.push(authenticatedDriver);
         }
+        
+        setDriver(authenticatedDriver);
+        localStorage.setItem('disconnected_driver', JSON.stringify(authenticatedDriver));
+        setPendingPhone(null);
+        toast.success('Login successful');
+        navigate('/');
+        return true;
       }
       
       throw new Error('Invalid OTP code');
