@@ -9,20 +9,16 @@ import { User, Settings, LogOut } from "lucide-react";
 const ProfilePage: React.FC = () => {
   const { driver, logout } = useAuth();
   const [animate, setAnimate] = useState(false);
-  
+
   useEffect(() => {
-    // Trigger animations after component mounts
-    const timer = setTimeout(() => {
-      setAnimate(true);
-    }, 100);
-    
+    const timer = setTimeout(() => setAnimate(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
   if (!driver) {
     return (
       <AppLayout title="Profile">
-        <div className="flex flex-col items-center py-16">
+        <div className="flex flex-col items-center py-16 animate-fade-in">
           <User className="h-20 w-20 text-[#9b87f5] mb-4" />
           <div className="text-xl text-gray-300 font-semibold">Logged Out</div>
         </div>
@@ -69,7 +65,6 @@ const ProfilePage: React.FC = () => {
                 <p className="text-[#D946EF] font-extrabold text-2xl">{driver.totalRides}</p>
               </div>
             </div>
-
             {driver.carDetails && (
               <div 
                 className={`mt-6 transition-all duration-500 ${
