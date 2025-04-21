@@ -1,13 +1,23 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/AppLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Settings } from "lucide-react";
+import { User, Settings, LogOut } from "lucide-react";
 
 const ProfilePage: React.FC = () => {
   const { driver, logout } = useAuth();
+  const [animate, setAnimate] = useState(false);
+  
+  useEffect(() => {
+    // Trigger animations after component mounts
+    const timer = setTimeout(() => {
+      setAnimate(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!driver) {
     return (
@@ -23,13 +33,20 @@ const ProfilePage: React.FC = () => {
   return (
     <AppLayout title="Profile">
       <div className="space-y-6 max-w-xl mx-auto">
-        <Card className="relative overflow-hidden border-none shadow-xl" style={{background: "linear-gradient(102.3deg, #9379fa 5.9%, #6E59A5 100%)"}}>
+        <Card 
+          className={`relative overflow-hidden border-none shadow-xl transform transition-all duration-500 ${
+            animate ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+          style={{background: "linear-gradient(102.3deg, #9379fa 5.9%, #6E59A5 100%)"}}
+        >
           <div className="absolute right-4 top-4 blur-2xl opacity-30 rounded-full w-28 h-28 bg-[#FFF7ED]" style={{zIndex:1}} />
           <CardHeader className="flex flex-row items-center gap-4 pb-2 bg-gradient-to-br from-[#7E69AB] via-[#8B5CF6] to-transparent rounded-t-md relative z-10">
             <img
               src={driver.avatarUrl || "https://randomuser.me/api/portraits/women/68.jpg"}
               alt="avatar"
-              className="w-20 h-20 rounded-full border-4 border-white shadow-lg object-cover"
+              className={`w-20 h-20 rounded-full border-4 border-white shadow-lg object-cover transition-all duration-700 ${
+                animate ? 'rotate-0 scale-100' : 'rotate-180 scale-50'
+              }`}
             />
             <div>
               <h3 className="text-xl md:text-2xl font-semibold text-white">{driver.name}</h3>
@@ -37,7 +54,12 @@ const ProfilePage: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div 
+              className={`grid grid-cols-2 gap-4 mb-4 transition-all duration-500 ${
+                animate ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              }`}
+              style={{ transitionDelay: '200ms' }}
+            >
               <div className="p-3 bg-[#F2FCE2] rounded-lg shadow-md flex flex-col items-center">
                 <p className="text-[#403E43] text-xs font-semibold">Driver Rating</p>
                 <p className="text-[#8B5CF6] font-extrabold text-2xl">{driver.rating}★</p>
@@ -49,7 +71,12 @@ const ProfilePage: React.FC = () => {
             </div>
 
             {driver.carDetails && (
-              <div className="mt-6">
+              <div 
+                className={`mt-6 transition-all duration-500 ${
+                  animate ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                }`}
+                style={{ transitionDelay: '300ms' }}
+              >
                 <h4 className="text-white font-medium mb-3 flex items-center gap-1">
                   <Settings className="inline w-4 h-4 mr-1 text-[#00C4CC]" />
                   Vehicle Information
@@ -75,9 +102,13 @@ const ProfilePage: React.FC = () => {
 
         <Button
           variant="destructive"
-          className="w-full font-semibold"
+          className={`w-full font-semibold transform transition-all duration-500 ${
+            animate ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`}
+          style={{ transitionDelay: '400ms' }}
           onClick={logout}
         >
+          <LogOut className="h-4 w-4 mr-2" />
           Log Out
         </Button>
       </div>

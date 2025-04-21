@@ -1,292 +1,246 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
-import { toast } from 'sonner';
+import { generateRideHistory } from '@/data/drivers';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/components/ui/sonner';
 
-// Types
-export interface Location {
-  lat: number;
-  lng: number;
+type Location = {
   address: string;
-}
+  lat?: number;
+  lng?: number;
+};
 
-export interface Rider {
+type RideRequest = {
   id: string;
-  name: string;
-  rating: number;
-  photoUrl?: string;
-}
-
-export interface RideRequest {
-  id: string;
-  rider: Rider;
   pickupLocation: Location;
   dropoffLocation: Location;
-  fare: number;
-  distance: number;
+  passengerName: string;
+  passengerRating: number;
+  estimatedFare: number;
   estimatedTime: number;
-  createdAt: Date;
-}
+  distance: number;
+};
 
-export interface ActiveRide extends RideRequest {
-  status: 'accepted' | 'arrived' | 'in_progress' | 'completed';
+type RideStatus = 'pending' | 'accepted' | 'arrived' | 'in_progress' | 'completed' | 'cancelled';
+
+type Ride = {
+  id: string;
+  pickupLocation: Location;
+  dropoffLocation: Location;
+  passengerName: string;
+  passengerRating?: number;
+  fare: number;
+  date?: Date;
+  status: RideStatus;
   startTime?: Date;
   endTime?: Date;
-}
+  distance: number;
+};
 
-export type RideHistory = (ActiveRide & { completed: true })[];
-
-// Mock data
-const mockRideRequests: RideRequest[] = [
-  {
-    id: 'ride-1',
-    rider: {
-      id: 'rider-101',
-      name: 'Alice',
-      rating: 4.7,
-    },
-    pickupLocation: {
-      lat: 40.7128,
-      lng: -74.0060,
-      address: '123 Broadway, New York, NY'
-    },
-    dropoffLocation: {
-      lat: 40.7580,
-      lng: -73.9855,
-      address: '456 Park Ave, New York, NY'
-    },
-    fare: 18.50,
-    distance: 3.2,
-    estimatedTime: 15,
-    createdAt: new Date()
-  },
-  {
-    id: 'ride-2',
-    rider: {
-      id: 'rider-102',
-      name: 'Bob',
-      rating: 4.9,
-    },
-    pickupLocation: {
-      lat: 40.7282,
-      lng: -73.9942,
-      address: '789 Grand St, Brooklyn, NY'
-    },
-    dropoffLocation: {
-      lat: 40.7114,
-      lng: -73.9568,
-      address: '321 Metropolitan Ave, Brooklyn, NY'
-    },
-    fare: 12.75,
-    distance: 2.1,
-    estimatedTime: 10,
-    createdAt: new Date(Date.now() - 120000) // 2 minutes ago
-  }
-];
-
-const mockRideHistory: RideHistory = [
-  {
-    id: 'hist-1',
-    rider: {
-      id: 'rider-103',
-      name: 'Charlie',
-      rating: 4.5,
-    },
-    pickupLocation: {
-      lat: 40.7328,
-      lng: -73.9867,
-      address: '555 Bedford Ave, Brooklyn, NY'
-    },
-    dropoffLocation: {
-      lat: 40.7193,
-      lng: -73.9552,
-      address: '777 Lorimer St, Brooklyn, NY'
-    },
-    fare: 15.25,
-    distance: 2.5,
-    estimatedTime: 12,
-    createdAt: new Date(Date.now() - 86400000), // 1 day ago
-    status: 'completed',
-    startTime: new Date(Date.now() - 86395000), // 1 day - 5 min ago
-    endTime: new Date(Date.now() - 86388000), // 1 day - 12 min ago
-    completed: true
-  },
-  {
-    id: 'hist-2',
-    rider: {
-      id: 'rider-104',
-      name: 'Dana',
-      rating: 4.8,
-    },
-    pickupLocation: {
-      lat: 40.7233,
-      lng: -73.9879,
-      address: '123 N 7th St, Brooklyn, NY'
-    },
-    dropoffLocation: {
-      lat: 40.7033,
-      lng: -73.9215,
-      address: '456 Wythe Ave, Brooklyn, NY'
-    },
-    fare: 22.80,
-    distance: 3.8,
-    estimatedTime: 18,
-    createdAt: new Date(Date.now() - 172800000), // 2 days ago
-    status: 'completed',
-    startTime: new Date(Date.now() - 172790000), // 2 days - 10 min ago
-    endTime: new Date(Date.now() - 172770000), // 2 days - 30 min ago
-    completed: true
-  }
-];
-
-// Context type
-interface RideContextType {
+type RideContextType = {
   rideRequests: RideRequest[];
-  activeRide: ActiveRide | null;
-  rideHistory: RideHistory;
-  acceptRide: (rideId: string) => void;
-  declineRide: (rideId: string) => void;
+  activeRide: Ride | null;
+  rideHistory: Ride[];
+  acceptRide: (id: string) => void;
+  declineRide: (id: string) => void;
   arriveAtPickup: () => void;
   startRide: () => void;
   completeRide: () => void;
   cancelRide: () => void;
-  isLoading: boolean;
-}
+};
 
 const RideContext = createContext<RideContextType | undefined>(undefined);
 
-export const RideProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { driver, isAuthenticated } = useAuth();
+const dummyRideRequests: RideRequest[] = [
+  {
+    id: 'request1',
+    pickupLocation: {
+      address: '123 Main St',
+      lat: 37.7749,
+      lng: -122.4194
+    },
+    dropoffLocation: {
+      address: '456 Market St',
+      lat: 37.7922,
+      lng: -122.3984
+    },
+    passengerName: 'John Smith',
+    passengerRating: 4.8,
+    estimatedFare: 15.75,
+    estimatedTime: 12,
+    distance: 4.2
+  },
+  {
+    id: 'request2',
+    pickupLocation: {
+      address: '789 Howard St',
+      lat: 37.7835,
+      lng: -122.3967
+    },
+    dropoffLocation: {
+      address: '101 California St',
+      lat: 37.7938,
+      lng: -122.3968
+    },
+    passengerName: 'Emma Davis',
+    passengerRating: 4.9,
+    estimatedFare: 12.50,
+    estimatedTime: 8,
+    distance: 2.8
+  }
+];
+
+export const RideProvider = ({ children }: { children: ReactNode }) => {
+  const { driver } = useAuth();
   const [rideRequests, setRideRequests] = useState<RideRequest[]>([]);
-  const [activeRide, setActiveRide] = useState<ActiveRide | null>(null);
-  const [rideHistory, setRideHistory] = useState<RideHistory>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [activeRide, setActiveRide] = useState<Ride | null>(null);
+  const [rideHistory, setRideHistory] = useState<Ride[]>([]);
 
-  // Load ride data (simulating Firestore)
+  // Load personalized ride history when driver changes
   useEffect(() => {
-    if (isAuthenticated && driver?.isOnline) {
-      // Load ride requests if driver is online
-      setRideRequests(mockRideRequests);
+    if (driver) {
+      const driverHistory = generateRideHistory(driver.id);
+      setRideHistory(driverHistory);
       
-      // Check for active ride in local storage
-      const savedRide = localStorage.getItem('active_ride');
-      if (savedRide) {
-        try {
-          const parsedRide = JSON.parse(savedRide);
-          // Convert string dates back to Date objects
-          parsedRide.createdAt = new Date(parsedRide.createdAt);
-          if (parsedRide.startTime) parsedRide.startTime = new Date(parsedRide.startTime);
-          if (parsedRide.endTime) parsedRide.endTime = new Date(parsedRide.endTime);
-          setActiveRide(parsedRide);
-        } catch (err) {
-          console.error('Failed to parse saved ride', err);
-          localStorage.removeItem('active_ride');
-        }
+      // Only show ride requests if driver is online
+      if (driver.isOnline) {
+        setRideRequests(dummyRideRequests);
+      } else {
+        setRideRequests([]);
       }
-      
-      // Load ride history
-      setRideHistory(mockRideHistory);
     } else {
-      // Clear ride data if driver is offline or not authenticated
+      setRideHistory([]);
       setRideRequests([]);
-      setActiveRide(null);
     }
-  }, [isAuthenticated, driver?.isOnline]);
+  }, [driver]);
 
-  // Accept a ride request
-  const acceptRide = (rideId: string) => {
-    setIsLoading(true);
-    
-    // Find the requested ride
-    const requestedRide = rideRequests.find(req => req.id === rideId);
-    
-    if (requestedRide) {
-      // Convert to active ride
-      const newActiveRide: ActiveRide = {
-        ...requestedRide,
-        status: 'accepted',
-      };
-      
-      // Update state and local storage
-      setActiveRide(newActiveRide);
-      localStorage.setItem('active_ride', JSON.stringify(newActiveRide));
-      
-      // Remove from available requests
-      setRideRequests(prev => prev.filter(req => req.id !== rideId));
-      
-      toast.success('Ride accepted! Navigate to pickup location.');
+  // Update ride requests when driver goes online/offline
+  useEffect(() => {
+    if (driver && driver.isOnline) {
+      setRideRequests(dummyRideRequests);
+    } else {
+      setRideRequests([]);
     }
+  }, [driver?.isOnline]);
+
+  const acceptRide = (id: string) => {
+    const request = rideRequests.find(req => req.id === id);
+    if (!request) return;
     
-    setIsLoading(false);
+    // Play accept sound
+    const acceptSound = new Audio("/sounds/accept.mp3");
+    acceptSound.volume = 0.5;
+    acceptSound.play().catch(e => console.log("Audio play failed:", e));
+    
+    const newRide: Ride = {
+      id: request.id,
+      pickupLocation: request.pickupLocation,
+      dropoffLocation: request.dropoffLocation,
+      passengerName: request.passengerName,
+      passengerRating: request.passengerRating,
+      fare: request.estimatedFare,
+      status: 'accepted',
+      startTime: new Date(),
+      distance: request.distance
+    };
+    
+    setActiveRide(newRide);
+    setRideRequests(prev => prev.filter(req => req.id !== id));
+    
+    toast.success("Ride accepted!", {
+      description: `Picking up ${request.passengerName}`,
+      duration: 3000,
+    });
   };
-
-  // Decline a ride request
-  const declineRide = (rideId: string) => {
-    setRideRequests(prev => prev.filter(req => req.id !== rideId));
-    toast.info('Ride declined');
+  
+  const declineRide = (id: string) => {
+    // Play decline sound
+    const declineSound = new Audio("/sounds/decline.mp3");
+    declineSound.volume = 0.4;
+    declineSound.play().catch(e => console.log("Audio play failed:", e));
+    
+    setRideRequests(prev => prev.filter(req => req.id !== id));
+    toast.info("Ride request declined", { duration: 2000 });
   };
-
-  // Driver arrives at pickup location
+  
   const arriveAtPickup = () => {
-    if (activeRide && activeRide.status === 'accepted') {
-      const updatedRide = {
-        ...activeRide,
-        status: 'arrived' as const
-      };
-      
-      setActiveRide(updatedRide);
-      localStorage.setItem('active_ride', JSON.stringify(updatedRide));
-      
-      toast.success('Arrived at pickup location');
-    }
+    if (!activeRide) return;
+    
+    // Play notification sound
+    const notifySound = new Audio("/sounds/notification.mp3");
+    notifySound.volume = 0.4;
+    notifySound.play().catch(e => console.log("Audio play failed:", e));
+    
+    setActiveRide({
+      ...activeRide,
+      status: 'arrived'
+    });
+    
+    toast.success("You've arrived at the pickup location!", { duration: 3000 });
   };
-
-  // Start the ride (passenger picked up)
+  
   const startRide = () => {
-    if (activeRide && activeRide.status === 'arrived') {
-      const updatedRide = {
-        ...activeRide,
-        status: 'in_progress' as const,
-        startTime: new Date()
-      };
-      
-      setActiveRide(updatedRide);
-      localStorage.setItem('active_ride', JSON.stringify(updatedRide));
-      
-      toast.success('Ride started');
-    }
+    if (!activeRide) return;
+    
+    // Play start ride sound
+    const startSound = new Audio("/sounds/start.mp3");
+    startSound.volume = 0.4;
+    startSound.play().catch(e => console.log("Audio play failed:", e));
+    
+    setActiveRide({
+      ...activeRide,
+      status: 'in_progress',
+      startTime: new Date()
+    });
+    
+    toast.success("Ride started!", {
+      description: `Heading to ${activeRide.dropoffLocation.address}`,
+      duration: 3000,
+    });
   };
-
-  // Complete the ride
+  
   const completeRide = () => {
-    if (activeRide && activeRide.status === 'in_progress') {
-      const completedRide = {
-        ...activeRide,
-        status: 'completed' as const,
-        endTime: new Date(),
-        completed: true as const
-      };
-      
-      // Add to history
-      setRideHistory(prev => [completedRide as any, ...prev]);
-      
-      // Clear active ride
-      setActiveRide(null);
-      localStorage.removeItem('active_ride');
-      
-      toast.success(`Ride completed! Earned $${completedRide.fare.toFixed(2)}`);
-    }
+    if (!activeRide) return;
+    
+    // Play complete sound
+    const completeSound = new Audio("/sounds/complete.mp3");
+    completeSound.volume = 0.5;
+    completeSound.play().catch(e => console.log("Audio play failed:", e));
+    
+    const completedRide: Ride = {
+      ...activeRide,
+      status: 'completed',
+      endTime: new Date()
+    };
+    
+    setRideHistory(prev => [completedRide, ...prev]);
+    setActiveRide(null);
+    
+    toast.success(`Ride completed! Earned $${completedRide.fare.toFixed(2)}`, {
+      duration: 4000,
+    });
   };
-
-  // Cancel the ride (after acceptance)
+  
   const cancelRide = () => {
-    if (activeRide) {
-      setActiveRide(null);
-      localStorage.removeItem('active_ride');
-      toast.error('Ride cancelled');
-    }
+    if (!activeRide) return;
+    
+    // Play cancel sound
+    const cancelSound = new Audio("/sounds/cancel.mp3");
+    cancelSound.volume = 0.4;
+    cancelSound.play().catch(e => console.log("Audio play failed:", e));
+    
+    const cancelledRide: Ride = {
+      ...activeRide,
+      status: 'cancelled',
+      endTime: new Date()
+    };
+    
+    setRideHistory(prev => [cancelledRide, ...prev]);
+    setActiveRide(null);
+    
+    toast.error("Ride cancelled", { duration: 3000 });
   };
-
+  
   return (
     <RideContext.Provider
       value={{
@@ -298,8 +252,7 @@ export const RideProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         arriveAtPickup,
         startRide,
         completeRide,
-        cancelRide,
-        isLoading
+        cancelRide
       }}
     >
       {children}
@@ -307,7 +260,7 @@ export const RideProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useRide = (): RideContextType => {
+export const useRide = () => {
   const context = useContext(RideContext);
   if (context === undefined) {
     throw new Error('useRide must be used within a RideProvider');
