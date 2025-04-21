@@ -14,6 +14,7 @@ import EarningsPage from "./pages/EarningsPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AuthPage from "./pages/AuthPage";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +50,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            <Route path="/auth" element={<Navigate to="/login" replace />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

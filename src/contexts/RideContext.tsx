@@ -1,29 +1,32 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { generateRideHistory } from '@/data/drivers';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/sonner';
 
-type Location = {
+export type Location = {
   address: string;
   lat?: number;
   lng?: number;
 };
 
-type RideRequest = {
+export type Rider = {
+  name: string;
+  rating: number;
+};
+
+export type RideRequest = {
   id: string;
   pickupLocation: Location;
   dropoffLocation: Location;
-  passengerName: string;
-  passengerRating: number;
-  estimatedFare: number;
+  rider: Rider;
+  fare: number;
   estimatedTime: number;
   distance: number;
 };
 
-type RideStatus = 'pending' | 'accepted' | 'arrived' | 'in_progress' | 'completed' | 'cancelled';
+export type RideStatus = 'pending' | 'accepted' | 'arrived' | 'in_progress' | 'completed' | 'cancelled';
 
-type Ride = {
+export type Ride = {
   id: string;
   pickupLocation: Location;
   dropoffLocation: Location;
@@ -64,9 +67,11 @@ const dummyRideRequests: RideRequest[] = [
       lat: 37.7922,
       lng: -122.3984
     },
-    passengerName: 'John Smith',
-    passengerRating: 4.8,
-    estimatedFare: 15.75,
+    rider: {
+      name: 'John Smith',
+      rating: 4.8
+    },
+    fare: 15.75,
     estimatedTime: 12,
     distance: 4.2
   },
@@ -82,9 +87,11 @@ const dummyRideRequests: RideRequest[] = [
       lat: 37.7938,
       lng: -122.3968
     },
-    passengerName: 'Emma Davis',
-    passengerRating: 4.9,
-    estimatedFare: 12.50,
+    rider: {
+      name: 'Emma Davis',
+      rating: 4.9
+    },
+    fare: 12.50,
     estimatedTime: 8,
     distance: 2.8
   }
@@ -136,9 +143,9 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
       id: request.id,
       pickupLocation: request.pickupLocation,
       dropoffLocation: request.dropoffLocation,
-      passengerName: request.passengerName,
-      passengerRating: request.passengerRating,
-      fare: request.estimatedFare,
+      passengerName: request.rider.name,
+      passengerRating: request.rider.rating,
+      fare: request.fare,
       status: 'accepted',
       startTime: new Date(),
       distance: request.distance
@@ -148,7 +155,7 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
     setRideRequests(prev => prev.filter(req => req.id !== id));
     
     toast.success("Ride accepted!", {
-      description: `Picking up ${request.passengerName}`,
+      description: `Picking up ${request.rider.name}`,
       duration: 3000,
     });
   };

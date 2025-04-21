@@ -1,5 +1,6 @@
 
 import { Driver } from '@/contexts/AuthContext';
+import { Ride, RideStatus } from '@/contexts/RideContext';
 
 export const driverProfiles: Driver[] = [
   {
@@ -80,15 +81,15 @@ export const driverProfiles: Driver[] = [
 ];
 
 // Create unique ride histories for each driver
-export const generateRideHistory = (driverId: string) => {
-  const baseRides = [
+export const generateRideHistory = (driverId: string): Ride[] => {
+  const baseRides: Ride[] = [
     {
       id: "ride1",
       pickupLocation: { address: "123 Main St" },
       dropoffLocation: { address: "456 Market St" },
       fare: 15.75,
       date: new Date(2025, 3, 18, 9, 30),
-      status: "completed",
+      status: "completed" as RideStatus,
       passengerName: "John Smith",
       distance: 4.2
     },
@@ -98,7 +99,7 @@ export const generateRideHistory = (driverId: string) => {
       dropoffLocation: { address: "101 Downtown Blvd" },
       fare: 23.50,
       date: new Date(2025, 3, 19, 14, 15),
-      status: "completed",
+      status: "completed" as RideStatus,
       passengerName: "Emma Davis",
       distance: 7.8
     },
@@ -108,7 +109,7 @@ export const generateRideHistory = (driverId: string) => {
       dropoffLocation: { address: "303 Union Square" },
       fare: 12.25,
       date: new Date(2025, 3, 20, 17, 45),
-      status: "completed",
+      status: "completed" as RideStatus,
       passengerName: "Michael Johnson",
       distance: 3.5
     },
@@ -118,7 +119,7 @@ export const generateRideHistory = (driverId: string) => {
       dropoffLocation: { address: "505 Broadway" },
       fare: 30.00,
       date: new Date(2025, 3, 21, 8, 0),
-      status: "completed",
+      status: "completed" as RideStatus,
       passengerName: "Sarah Williams",
       distance: 9.1
     }
@@ -135,7 +136,7 @@ export const generateRideHistory = (driverId: string) => {
           dropoffLocation: { address: "707 Ocean Ave" },
           fare: 18.25,
           date: new Date(2025, 3, 21, 19, 30),
-          status: "completed",
+          status: "completed" as RideStatus,
           passengerName: "David Miller",
           distance: 5.3
         }
@@ -149,7 +150,7 @@ export const generateRideHistory = (driverId: string) => {
           dropoffLocation: { address: "909 Innovation Dr" },
           fare: 27.50,
           date: new Date(2025, 3, 21, 12, 15),
-          status: "completed",
+          status: "completed" as RideStatus,
           passengerName: "Jennifer Lee",
           distance: 8.7
         },
@@ -159,7 +160,7 @@ export const generateRideHistory = (driverId: string) => {
           dropoffLocation: { address: "111 Research Blvd" },
           fare: 22.00,
           date: new Date(2025, 3, 21, 15, 45),
-          status: "completed",
+          status: "completed" as RideStatus,
           passengerName: "Robert Chen",
           distance: 6.5
         }
