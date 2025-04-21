@@ -30,6 +30,9 @@ const EarningsSummary: React.FC = () => {
     })
     .reduce((sum, ride) => sum + ride.fare, 0);
   
+  // Default value if driver.earnings is undefined
+  const totalEarnings = driver?.earnings || 0;
+  
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader className="pb-2">
@@ -47,11 +50,11 @@ const EarningsSummary: React.FC = () => {
           </div>
           <div className="p-3 bg-gray-700 rounded-lg">
             <p className="text-gray-400 text-sm">Total Earnings</p>
-            <p className="text-white font-bold text-xl">${driver?.earnings.toFixed(2)}</p>
+            <p className="text-white font-bold text-xl">${totalEarnings.toFixed(2)}</p>
           </div>
           <div className="p-3 bg-gray-700 rounded-lg">
             <p className="text-gray-400 text-sm">Completed Rides</p>
-            <p className="text-white font-bold text-xl">{driver?.totalRides}</p>
+            <p className="text-white font-bold text-xl">{driver?.totalRides || 0}</p>
           </div>
         </div>
       </CardContent>

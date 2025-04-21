@@ -14,11 +14,15 @@ type Driver = {
   totalRides: number;
   carDetails?: CarDetails;
   avatarUrl?: string;
+  isOnline: boolean;
+  earnings: number;
 };
 
 type AuthContextProps = {
   driver: Driver | null;
   logout: () => void;
+  updateDriverStatus: (status: boolean) => void;
+  isAuthenticated: boolean;
 };
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -35,8 +39,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       model: "Toyota Camry 2021",
       color: "Deep Blue",
       plateNumber: "ABC-4567"
-    }
+    },
+    isOnline: false,
+    earnings: 2843.75
   });
+
+  const isAuthenticated = !!driver;
+
+  // Toggle driver online status
+  const updateDriverStatus = (status: boolean) => {
+    setDriver(prev => {
+      if (!prev) return prev;
+      return { ...prev, isOnline: status };
+    });
+  };
 
   // For the dummy app, just clear data (but page reload restores dummy info)
   const logout = () => {
@@ -44,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ driver, logout }}>
+    <AuthContext.Provider value={{ driver, logout, updateDriverStatus, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
