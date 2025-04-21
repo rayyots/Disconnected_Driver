@@ -38,11 +38,23 @@ export type Ride = {
   startTime?: Date;
   endTime?: Date;
   distance: number;
+  rider?: Rider; // Added for compatibility with RideHistoryList
+};
+
+export type ActiveRide = {
+  id: string;
+  pickupLocation: Location;
+  dropoffLocation: Location;
+  rider: Rider;
+  fare: number;
+  estimatedTime: number;
+  distance: number;
+  status: RideStatus;
 };
 
 type RideContextType = {
   rideRequests: RideRequest[];
-  activeRide: Ride | null;
+  activeRide: ActiveRide | null;
   rideHistory: Ride[];
   acceptRide: (id: string) => void;
   declineRide: (id: string) => void;
@@ -100,16 +112,14 @@ const dummyRideRequests: RideRequest[] = [
 export const RideProvider = ({ children }: { children: ReactNode }) => {
   const { driver } = useAuth();
   const [rideRequests, setRideRequests] = useState<RideRequest[]>([]);
-  const [activeRide, setActiveRide] = useState<Ride | null>(null);
+  const [activeRide, setActiveRide] = useState<ActiveRide | null>(null);
   const [rideHistory, setRideHistory] = useState<Ride[]>([]);
 
-  // Load personalized ride history when driver changes
   useEffect(() => {
     if (driver) {
       const driverHistory = generateRideHistory(driver.id);
       setRideHistory(driverHistory);
       
-      // Only show ride requests if driver is online
       if (driver.isOnline) {
         setRideRequests(dummyRideRequests);
       } else {
@@ -121,7 +131,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [driver]);
 
-  // Update ride requests when driver goes online/offline
   useEffect(() => {
     if (driver && driver.isOnline) {
       setRideRequests(dummyRideRequests);
@@ -134,7 +143,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
     const request = rideRequests.find(req => req.id === id);
     if (!request) return;
     
-    // Play accept sound
     const acceptSound = new Audio("/sounds/accept.mp3");
     acceptSound.volume = 0.5;
     acceptSound.play().catch(e => console.log("Audio play failed:", e));
@@ -161,7 +169,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const declineRide = (id: string) => {
-    // Play decline sound
     const declineSound = new Audio("/sounds/decline.mp3");
     declineSound.volume = 0.4;
     declineSound.play().catch(e => console.log("Audio play failed:", e));
@@ -173,7 +180,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
   const arriveAtPickup = () => {
     if (!activeRide) return;
     
-    // Play notification sound
     const notifySound = new Audio("/sounds/notification.mp3");
     notifySound.volume = 0.4;
     notifySound.play().catch(e => console.log("Audio play failed:", e));
@@ -189,7 +195,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
   const startRide = () => {
     if (!activeRide) return;
     
-    // Play start ride sound
     const startSound = new Audio("/sounds/start.mp3");
     startSound.volume = 0.4;
     startSound.play().catch(e => console.log("Audio play failed:", e));
@@ -209,7 +214,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
   const completeRide = () => {
     if (!activeRide) return;
     
-    // Play complete sound
     const completeSound = new Audio("/sounds/complete.mp3");
     completeSound.volume = 0.5;
     completeSound.play().catch(e => console.log("Audio play failed:", e));
@@ -231,7 +235,6 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
   const cancelRide = () => {
     if (!activeRide) return;
     
-    // Play cancel sound
     const cancelSound = new Audio("/sounds/cancel.mp3");
     cancelSound.volume = 0.4;
     cancelSound.play().catch(e => console.log("Audio play failed:", e));
