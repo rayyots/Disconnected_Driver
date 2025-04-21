@@ -95,7 +95,7 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
     <Card className="w-full bg-gray-800 border-gray-700 overflow-hidden">
       <div className="bg-[#00C4CC] p-3 flex justify-between items-center">
         <h3 className="font-medium text-white">{getStatusHeader()}</h3>
-        <div className="text-white font-bold">${ride.fare.toFixed(2)}</div>
+        <div className="text-white font-bold">EGP {ride.fare.toFixed(2)}</div>
       </div>
       
       <CardContent className="p-4">
@@ -138,7 +138,7 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
           </div>
           <div className="flex items-center">
             <Navigation className="h-4 w-4 mr-1" />
-            <span>{ride.distance.toFixed(1)} mi</span>
+            <span>{ride.distance.toFixed(1)} km</span>
           </div>
         </div>
       </CardContent>

@@ -5,75 +5,75 @@ import { Ride, RideStatus } from '@/contexts/RideContext';
 export const driverProfiles: Driver[] = [
   {
     id: "driver1",
-    name: "Alexandra Foster",
-    phone: "+1 (555) 483-2942",
+    name: "Omar Mahmoud",
+    phone: "01118692999",
     rating: 4.92,
     totalRides: 289,
-    avatarUrl: "https://randomuser.me/api/portraits/women/68.jpg",
+    avatarUrl: "https://randomuser.me/api/portraits/men/12.jpg",
     carDetails: {
-      model: "Toyota Camry 2021",
-      color: "Deep Blue",
-      plateNumber: "ABC-4567"
+      model: "Toyota Corolla 2022",
+      color: "Grey",
+      plateNumber: "ب ل ت -4567"
     },
     isOnline: false,
     earnings: 2843.75
   },
   {
     id: "driver2",
-    name: "Marcus Chen",
-    phone: "+1 (555) 112-3789",
+    name: "Mohammed Samy",
+    phone: "01234567890",
     rating: 4.87,
     totalRides: 427,
     avatarUrl: "https://randomuser.me/api/portraits/men/22.jpg",
     carDetails: {
-      model: "Honda Accord 2022",
+      model: "Honda Civic 2016",
       color: "Silver",
-      plateNumber: "XYZ-8901"
+      plateNumber: "خ ق ي-8901"
     },
     isOnline: false,
     earnings: 4125.50
   },
   {
     id: "driver3",
-    name: "Sophia Rodriguez",
-    phone: "+1 (555) 329-6710",
+    name: "Mayar Hossam",
+    phone: "01112345678",
     rating: 4.95,
     totalRides: 512,
     avatarUrl: "https://randomuser.me/api/portraits/women/45.jpg",
     carDetails: {
-      model: "Tesla Model 3",
+      model: "Chevrolet Aveo 2018",
       color: "Red",
-      plateNumber: "ELT-5432"
+      plateNumber: "ا ت ف-5432"
     },
     isOnline: false,
     earnings: 5237.25
   },
   {
     id: "driver4",
-    name: "James Wilson",
-    phone: "+1 (555) 778-1235",
+    name: "Hamza Ahmed",
+    phone: "01098765432",
     rating: 4.79,
     totalRides: 194,
     avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg",
     carDetails: {
-      model: "Ford Escape 2021",
+      model: "Ford Focus 2020",
       color: "White",
-      plateNumber: "FRD-9876"
+      plateNumber: "ح ر ص-9876"
     },
     isOnline: false,
     earnings: 2105.50
   },
   {
     id: "driver5",
-    name: "Olivia Johnson",
-    phone: "+1 (555) 663-4501",
+    name: "Sara Khaled",
+    phone: "01567890123",
     rating: 4.91,
     totalRides: 351,
     avatarUrl: "https://randomuser.me/api/portraits/women/28.jpg",
     carDetails: {
-      model: "Hyundai Tucson 2022",
-      color: "Forest Green",
-      plateNumber: "HYN-1122"
+      model: "Hyundai Elantra 2021",
+      color: "Black",
+      plateNumber: "و و ح-1122"
     },
     isOnline: false,
     earnings: 3750.75
@@ -85,42 +85,42 @@ export const generateRideHistory = (driverId: string): Ride[] => {
   const baseRides: Ride[] = [
     {
       id: "ride1",
-      pickupLocation: { address: "123 Main St" },
-      dropoffLocation: { address: "456 Market St" },
-      fare: 15.75,
+      pickupLocation: { address: "Downtown Mall" },
+      dropoffLocation: { address: "Ibn Elsham" },
+      fare: 55.75,
       date: new Date(2025, 3, 18, 9, 30),
       status: "completed" as RideStatus,
-      passengerName: "John Smith",
+      passengerName: "Moamen Zakaria",
       distance: 4.2
     },
     {
       id: "ride2",
-      pickupLocation: { address: "789 Park Ave" },
-      dropoffLocation: { address: "101 Downtown Blvd" },
-      fare: 23.50,
+      pickupLocation: { address: "CFC mall" },
+      dropoffLocation: { address: "Mahmoud-Elfar" },
+      fare: 47.50,
       date: new Date(2025, 3, 19, 14, 15),
       status: "completed" as RideStatus,
-      passengerName: "Emma Davis",
+      passengerName: "Ahmed Zaki",
       distance: 7.8
     },
     {
       id: "ride3",
-      pickupLocation: { address: "202 College St" },
-      dropoffLocation: { address: "303 Union Square" },
-      fare: 12.25,
+      pickupLocation: { address: "Airport Terminal 3" },
+      dropoffLocation: { address: "Zamalek" },
+      fare: 120.25,
       date: new Date(2025, 3, 20, 17, 45),
       status: "completed" as RideStatus,
-      passengerName: "Michael Johnson",
+      passengerName: "Mahmoud Ellithy",
       distance: 3.5
     },
     {
       id: "ride4",
-      pickupLocation: { address: "404 Pine St" },
-      dropoffLocation: { address: "505 Broadway" },
-      fare: 30.00,
+      pickupLocation: { address: "Tolip Elnarges" },
+      dropoffLocation: { address: "Elshorouk" },
+      fare: 200.00,
       date: new Date(2025, 3, 21, 8, 0),
       status: "completed" as RideStatus,
-      passengerName: "Sarah Williams",
+      passengerName: "Ibrahim Morsi",
       distance: 9.1
     }
   ];
@@ -132,12 +132,12 @@ export const generateRideHistory = (driverId: string): Ride[] => {
         ...baseRides,
         {
           id: "ride5",
-          pickupLocation: { address: "606 Sunset Blvd" },
-          dropoffLocation: { address: "707 Ocean Ave" },
-          fare: 18.25,
+          pickupLocation: { address: "Ain Shams Hospital" },
+          dropoffLocation: { address: "Park View" },
+          fare: 180.25,
           date: new Date(2025, 3, 21, 19, 30),
           status: "completed" as RideStatus,
-          passengerName: "David Miller",
+          passengerName: "Ali Hassan",
           distance: 5.3
         }
       ];
@@ -146,22 +146,22 @@ export const generateRideHistory = (driverId: string): Ride[] => {
         ...baseRides.slice(1),
         {
           id: "ride6",
-          pickupLocation: { address: "808 Tech Park" },
-          dropoffLocation: { address: "909 Innovation Dr" },
-          fare: 27.50,
+          pickupLocation: { address: "Metropolitan" },
+          dropoffLocation: { address: "Mountain View" },
+          fare: 62.50,
           date: new Date(2025, 3, 21, 12, 15),
           status: "completed" as RideStatus,
-          passengerName: "Jennifer Lee",
+          passengerName: "Karma Saeed",
           distance: 8.7
         },
         {
           id: "ride7",
-          pickupLocation: { address: "110 Medical Center" },
-          dropoffLocation: { address: "111 Research Blvd" },
-          fare: 22.00,
+          pickupLocation: { address: "Maadi" },
+          dropoffLocation: { address: "KFC Maadi" },
+          fare: 42.00,
           date: new Date(2025, 3, 21, 15, 45),
           status: "completed" as RideStatus,
-          passengerName: "Robert Chen",
+          passengerName: "Adham Amr",
           distance: 6.5
         }
       ];
@@ -170,22 +170,22 @@ export const generateRideHistory = (driverId: string): Ride[] => {
         ...baseRides,
         {
           id: "ride8",
-          pickupLocation: { address: "212 Airport Terminal" },
-          dropoffLocation: { address: "313 Hotel Plaza" },
+          pickupLocation: { address: "Airport Terminal 2" },
+          dropoffLocation: { address: "Grand Hotel Plaza" },
           fare: 45.75,
           date: new Date(2025, 3, 21, 20, 0),
           status: "completed",
-          passengerName: "Thomas Garcia",
+          passengerName: "Zad Asran",
           distance: 12.3
         },
         {
           id: "ride9",
-          pickupLocation: { address: "414 Conference Center" },
-          dropoffLocation: { address: "515 Business Park" },
+          pickupLocation: { address: "Capital Conference Center" },
+          dropoffLocation: { address: "Cairo Business Park" },
           fare: 32.25,
           date: new Date(2025, 3, 21, 17, 30),
           status: "completed",
-          passengerName: "Lisa Martinez",
+          passengerName: "Hossam Elshazly",
           distance: 9.8
         }
       ];
@@ -196,12 +196,12 @@ export const generateRideHistory = (driverId: string): Ride[] => {
         ...baseRides.slice(2),
         {
           id: "ride10",
-          pickupLocation: { address: "616 Shopping Mall" },
-          dropoffLocation: { address: "717 Residential Complex" },
-          fare: 19.50,
+          pickupLocation: { address: "City stars Mall" },
+          dropoffLocation: { address: "Egyptian Chinese University" },
+          fare: 99.50,
           date: new Date(2025, 3, 21, 14, 0),
           status: "completed",
-          passengerName: "Kevin Taylor",
+          passengerName: "Sherwet Gabr",
           distance: 5.7
         }
       ];
