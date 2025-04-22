@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { generateRideHistory } from "@/data/drivers";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/sonner";
+import { useAudio } from "@/hooks/useAudio";
 import {
   RideContextType,
   Ride,
@@ -13,6 +13,14 @@ import {
   RideStatus,
   Location,
 } from "./rideTypes";
+import {
+  acceptRideUtil,
+  declineRideUtil,
+  arriveAtPickupUtil,
+  startRideUtil,
+  completeRideUtil,
+  cancelRideUtil,
+} from "@/utils/rideManager";
 
 const RideContext = createContext<RideContextType | undefined>(undefined);
 
@@ -64,6 +72,22 @@ export const RideProvider = ({ children }: RideProviderProps) => {
   const [rideRequests, setRideRequests] = useState<RideRequest[]>([]);
   const [activeRide, setActiveRide] = useState<ActiveRide | null>(null);
   const [rideHistory, setRideHistory] = useState<Ride[]>([]);
+  const { playSound } = useAudio();
+
+  function showToast(
+    type: "success" | "error" | "info",
+    title: string,
+    description?: string,
+    duration = 3000
+  ) {
+    if (type === "success") {
+      toast.success(title, { description, duration });
+    } else if (type === "error") {
+      toast.error(title, { description, duration });
+    } else {
+      toast.info(title, { description, duration });
+    }
+  }
 
   useEffect(() => {
     if (driver) {
@@ -89,133 +113,57 @@ export const RideProvider = ({ children }: RideProviderProps) => {
     }
   }, [driver?.isOnline]);
 
-  const acceptRide = (id: string) => {
-    const request = rideRequests.find((req) => req.id === id);
-    if (!request) return;
+  const acceptRide = (id: string) =>
+    acceptRideUtil(
+      id,
+      rideRequests,
+      setActiveRide,
+      setRideRequests,
+      playSound,
+      (type, msg, desc, duration) => showToast(type, msg, desc, duration)
+    );
 
-    const acceptSound = new Audio("/sounds/accept.mp3");
-    acceptSound.volume = 0.5;
-    acceptSound.play().catch((e) => console.log("Audio play failed:", e));
+  const declineRide = (id: string) =>
+    declineRideUtil(
+      id,
+      setRideRequests,
+      playSound,
+      (type, msg, desc, duration) => showToast(type, msg, desc, duration)
+    );
 
-    const newActiveRide: ActiveRide = {
-      id: request.id,
-      pickupLocation: request.pickupLocation,
-      dropoffLocation: request.dropoffLocation,
-      rider: request.rider,
-      fare: request.fare,
-      estimatedTime: request.estimatedTime,
-      distance: request.distance,
-      status: "accepted",
-    };
+  const arriveAtPickup = () =>
+    arriveAtPickupUtil(
+      activeRide,
+      setActiveRide,
+      playSound,
+      (type, msg, desc, duration) => showToast(type, msg, desc, duration)
+    );
 
-    setActiveRide(newActiveRide);
-    setRideRequests((prev) => prev.filter((req) => req.id !== id));
+  const startRide = () =>
+    startRideUtil(
+      activeRide,
+      setActiveRide,
+      playSound,
+      (type, msg, desc, duration) => showToast(type, msg, desc, duration)
+    );
 
-    toast.success("Ride accepted!", {
-      description: `Picking up ${request.rider.name}`,
-      duration: 3000,
-    });
-  };
+  const completeRide = () =>
+    completeRideUtil(
+      activeRide,
+      setRideHistory,
+      setActiveRide,
+      playSound,
+      (type, msg, desc, duration) => showToast(type, msg, desc, duration)
+    );
 
-  const declineRide = (id: string) => {
-    const declineSound = new Audio("/sounds/decline.mp3");
-    declineSound.volume = 0.4;
-    declineSound.play().catch((e) => console.log("Audio play failed:", e));
-
-    setRideRequests((prev) => prev.filter((req) => req.id !== id));
-    toast.info("Ride request declined", { duration: 2000 });
-  };
-
-  const arriveAtPickup = () => {
-    if (!activeRide) return;
-
-    const notifySound = new Audio("/sounds/notification.mp3");
-    notifySound.volume = 0.4;
-    notifySound.play().catch((e) => console.log("Audio play failed:", e));
-
-    setActiveRide({
-      ...activeRide,
-      status: "arrived",
-    });
-
-    toast.success("You've arrived at the pickup location!", { duration: 3000 });
-  };
-
-  const startRide = () => {
-    if (!activeRide) return;
-
-    const startSound = new Audio("/sounds/start.mp3");
-    startSound.volume = 0.4;
-    startSound.play().catch((e) => console.log("Audio play failed:", e));
-
-    setActiveRide({
-      ...activeRide,
-      status: "in_progress",
-    });
-
-    toast.success("Ride started!", {
-      description: `Heading to ${activeRide.dropoffLocation.address}`,
-      duration: 3000,
-    });
-  };
-
-  const completeRide = () => {
-    if (!activeRide) return;
-
-    const completeSound = new Audio("/sounds/complete.mp3");
-    completeSound.volume = 0.5;
-    completeSound.play().catch((e) => console.log("Audio play failed:", e));
-
-    // Convert ActiveRide to Ride with required props.
-    const completedRide: Ride = {
-      id: activeRide.id,
-      pickupLocation: activeRide.pickupLocation,
-      dropoffLocation: activeRide.dropoffLocation,
-      passengerName: activeRide.rider.name,
-      passengerRating: activeRide.rider.rating,
-      fare: activeRide.fare,
-      status: "completed",
-      endTime: new Date(),
-      date: new Date(),
-      distance: activeRide.distance,
-      rider: activeRide.rider,
-    };
-
-    setRideHistory((prev) => [completedRide, ...prev]);
-    setActiveRide(null);
-
-    toast.success(`Ride completed! Earned EGP ${completedRide.fare.toFixed(2)}`, {
-      duration: 4000,
-    });
-  };
-
-  const cancelRide = () => {
-    if (!activeRide) return;
-
-    const cancelSound = new Audio("/sounds/cancel.mp3");
-    cancelSound.volume = 0.4;
-    cancelSound.play().catch((e) => console.log("Audio play failed:", e));
-
-    // Convert ActiveRide to Ride with required props.
-    const cancelledRide: Ride = {
-      id: activeRide.id,
-      pickupLocation: activeRide.pickupLocation,
-      dropoffLocation: activeRide.dropoffLocation,
-      passengerName: activeRide.rider.name,
-      passengerRating: activeRide.rider.rating,
-      fare: activeRide.fare,
-      status: "cancelled",
-      endTime: new Date(),
-      date: new Date(),
-      distance: activeRide.distance,
-      rider: activeRide.rider,
-    };
-
-    setRideHistory((prev) => [cancelledRide, ...prev]);
-    setActiveRide(null);
-
-    toast.error("Ride cancelled", { duration: 3000 });
-  };
+  const cancelRide = () =>
+    cancelRideUtil(
+      activeRide,
+      setRideHistory,
+      setActiveRide,
+      playSound,
+      (type, msg, desc, duration) => showToast(type, msg, desc, duration)
+    );
 
   return (
     <RideContext.Provider
