@@ -1,18 +1,61 @@
-import React, { useMemo } from 'react';
+
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useRide } from '@/contexts/RideContext';
 import { CalendarIcon, Clock, MapPin } from 'lucide-react';
+import FilterRideHistory from './FilterRideHistory';
 
 const RideHistoryList: React.FC = () => {
   const { rideHistory } = useRide();
   
-  // Memoize formatted ride data to avoid recalculations on every render
+  // Filter state
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined
+  });
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  
+  // Reset filters function
+  const resetFilters = () => {
+    setDateRange({ from: undefined, to: undefined });
+    setStatusFilter(null);
+  };
+  
+  // Memoize formatted and filtered ride data
   const formattedRides = useMemo(() => {
-    return rideHistory.map(ride => ({
+    // First format the rides
+    const formatted = rideHistory.map(ride => ({
       ...ride,
       formattedDate: formatDate(ride.endTime)
     }));
-  }, [rideHistory]);
+    
+    // Then apply filters
+    return formatted.filter(ride => {
+      // Apply date range filter if set
+      if (dateRange.from && ride.endTime) {
+        const from = new Date(dateRange.from);
+        from.setHours(0, 0, 0, 0);
+        
+        const rideDate = new Date(ride.endTime);
+        if (rideDate < from) return false;
+      }
+      
+      if (dateRange.to && ride.endTime) {
+        const to = new Date(dateRange.to);
+        to.setHours(23, 59, 59, 999);
+        
+        const rideDate = new Date(ride.endTime);
+        if (rideDate > to) return false;
+      }
+      
+      // Apply status filter if set
+      if (statusFilter && ride.status !== statusFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [rideHistory, dateRange, statusFilter]);
   
   // Format date for display
   const formatDate = (date: Date | undefined) => {
@@ -56,59 +99,58 @@ const RideHistoryList: React.FC = () => {
     }
   };
   
-  if (formattedRides.length === 0) {
-    return (
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader className="pb-2">
-          <h3 className="text-lg font-medium text-white">Ride History</h3>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-gray-400">
-            <p>No ride history yet</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-  
   return (
     <Card className="bg-gray-800 border-gray-700">
       <CardHeader className="pb-2">
         <h3 className="text-lg font-medium text-white">Ride History</h3>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="divide-y divide-gray-700">
-          {formattedRides.map(ride => (
-            <div key={ride.id} className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="font-medium text-white">{ride.passengerName || 'Unknown Passenger'}</h4>
-                  <div className="flex items-center text-sm text-gray-400">
-                    <CalendarIcon className="h-3 w-3 mr-1" />
-                    <span>{ride.formattedDate}</span>
+      <CardContent>
+        <FilterRideHistory 
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          onResetFilters={resetFilters}
+        />
+        
+        {formattedRides.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            <p>No ride history matches your filters</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-700">
+            {formattedRides.map(ride => (
+              <div key={ride.id} className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-medium text-white">{ride.passengerName || 'Unknown Passenger'}</h4>
+                    <div className="flex items-center text-sm text-gray-400">
+                      <CalendarIcon className="h-3 w-3 mr-1" />
+                      <span>{ride.formattedDate}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="text-[#00C4CC] font-bold">EGP {ride.fare.toFixed(2)}</div>
-              </div>
-              
-              <div className="mt-3 space-y-2">
-                <div className="flex items-start">
-                  <div className="min-w-8 flex justify-center pt-1">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  </div>
-                  <div className="text-sm text-gray-400">{ride.pickupLocation?.address || 'Unknown location'}</div>
+                  <div className="text-[#00C4CC] font-bold">EGP {ride.fare.toFixed(2)}</div>
                 </div>
                 
-                <div className="flex items-start">
-                  <div className="min-w-8 flex justify-center pt-1">
-                    <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-start">
+                    <div className="min-w-8 flex justify-center pt-1">
+                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="text-sm text-gray-400">{ride.pickupLocation?.address || 'Unknown location'}</div>
                   </div>
-                  <div className="text-sm text-gray-400">{ride.dropoffLocation?.address || 'Unknown location'}</div>
+                  
+                  <div className="flex items-start">
+                    <div className="min-w-8 flex justify-center pt-1">
+                      <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                    </div>
+                    <div className="text-sm text-gray-400">{ride.dropoffLocation?.address || 'Unknown location'}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
