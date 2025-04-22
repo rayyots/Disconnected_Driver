@@ -22,8 +22,7 @@ export type RideRequest = {
   distance: number;
 };
 
-export type RideStatus =
-  | "pending"
+export type RideStatus = 
   | "accepted"
   | "arrived"
   | "in_progress"

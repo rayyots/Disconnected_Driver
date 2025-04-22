@@ -2,6 +2,7 @@
 import { AppRegistry } from 'react-native';
 import App from './App';
 
+// Register the app
 AppRegistry.registerComponent('DisconnectedDriver', () => App);
 
 // Web support
