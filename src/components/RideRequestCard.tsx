@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Clock, Navigation, User } from 'lucide-react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Define the RideRequest type locally if it's not exported
 interface Location {
@@ -47,75 +46,210 @@ const RideRequestCard: React.FC<RideRequestCardProps> = ({
   const dropoffAddress = request?.dropoffLocation?.address || 'Unknown location';
   
   return (
-    <Card className="w-full bg-gray-800 border-gray-700 overflow-hidden animate-slide-in">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex items-center">
-            <div className="bg-gray-700 p-2 rounded-full mr-3">
-              <User className="h-5 w-5 text-[#00C4CC]" />
-            </div>
-            <div>
-              <h3 className="font-medium text-white">{riderName}</h3>
-              <div className="text-sm text-gray-400">Rating: {riderRating}★</div>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[#00C4CC] font-bold">EGP {fare.toFixed(2)}</div>
-            <div className="text-sm text-gray-400">{distance.toFixed(1)} Km</div>
-          </div>
-        </div>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <View style={styles.userInfo}>
+            <View style={styles.userIcon}>
+              <Ionicons name="person" size={20} color="#00C4CC" />
+            </View>
+            <View>
+              <Text style={styles.userName}>{riderName}</Text>
+              <Text style={styles.userRating}>Rating: {riderRating}★</Text>
+            </View>
+          </View>
+          <View style={styles.fareInfo}>
+            <Text style={styles.fare}>EGP {fare.toFixed(2)}</Text>
+            <Text style={styles.distance}>{distance.toFixed(1)} Km</Text>
+          </View>
+        </View>
         
-        <div className="space-y-3 mb-4">
-          <div className="flex items-start">
-            <div className="min-w-8 flex justify-center pt-1">
-              <div className="h-2 w-2 rounded-full bg-green-500"></div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-400">Pickup</div>
-              <div className="text-white">{pickupAddress}</div>
-            </div>
-          </div>
+        <View style={styles.locations}>
+          <View style={styles.locationRow}>
+            <View style={styles.locationDot}>
+              <View style={styles.pickupDot} />
+            </View>
+            <View>
+              <Text style={styles.locationLabel}>Pickup</Text>
+              <Text style={styles.locationAddress}>{pickupAddress}</Text>
+            </View>
+          </View>
           
-          <div className="flex items-start">
-            <div className="min-w-8 flex justify-center pt-1">
-              <div className="h-2 w-2 rounded-full bg-red-500"></div>
-            </div>
-            <div>
-              <div className="text-sm text-gray-400">Dropoff</div>
-              <div className="text-white">{dropoffAddress}</div>
-            </div>
-          </div>
-        </div>
+          <View style={styles.locationRow}>
+            <View style={styles.locationDot}>
+              <View style={styles.dropoffDot} />
+            </View>
+            <View>
+              <Text style={styles.locationLabel}>Dropoff</Text>
+              <Text style={styles.locationAddress}>{dropoffAddress}</Text>
+            </View>
+          </View>
+        </View>
         
-        <div className="flex justify-between text-sm text-gray-400">
-          <div className="flex items-center">
-            <Clock className="h-4 w-4 mr-1" />
-            <span>{estimatedTime} mins</span>
-          </div>
-          <div className="flex items-center">
-            <Navigation className="h-4 w-4 mr-1" />
-            <span>{distance.toFixed(1)} km</span>
-          </div>
-        </div>
-      </CardContent>
+        <View style={styles.footer}>
+          <View style={styles.timeInfo}>
+            <Ionicons name="time-outline" size={16} color="#9ca3af" />
+            <Text style={styles.timeText}>{estimatedTime} mins</Text>
+          </View>
+          <View style={styles.distanceInfo}>
+            <Ionicons name="navigate-outline" size={16} color="#9ca3af" />
+            <Text style={styles.distanceText}>{distance.toFixed(1)} km</Text>
+          </View>
+        </View>
+      </View>
       
-      <CardFooter className="bg-gray-900 p-3 flex justify-between gap-3">
-        <Button 
-          variant="outline" 
-          className="w-1/2 border-gray-600 text-white hover:bg-gray-700"
-          onClick={() => onDecline(request.id)}
+      <View style={styles.actions}>
+        <TouchableOpacity 
+          style={styles.declineButton}
+          onPress={() => onDecline(request.id)}
         >
-          Decline
-        </Button>
-        <Button 
-          className="w-1/2 bg-[#00C4CC] hover:bg-[#00A8AF] text-white"
-          onClick={() => onAccept(request.id)}
+          <Text style={styles.declineText}>Decline</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.acceptButton}
+          onPress={() => onAccept(request.id)}
         >
-          Accept
-        </Button>
-      </CardFooter>
-    </Card>
+          <Text style={styles.acceptText}>Accept</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#111827',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#374151',
+    overflow: 'hidden',
+  },
+  content: {
+    padding: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userIcon: {
+    backgroundColor: '#1f2937',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'white',
+  },
+  userRating: {
+    fontSize: 14,
+    color: '#9ca3af',
+  },
+  fareInfo: {
+    alignItems: 'flex-end',
+  },
+  fare: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#00C4CC',
+  },
+  distance: {
+    fontSize: 14,
+    color: '#9ca3af',
+  },
+  locations: {
+    marginBottom: 16,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  locationDot: {
+    width: 32,
+    alignItems: 'center',
+    paddingTop: 4,
+  },
+  pickupDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#10b981', // green-500
+  },
+  dropoffDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ef4444', // red-500
+  },
+  locationLabel: {
+    fontSize: 14,
+    color: '#9ca3af',
+  },
+  locationAddress: {
+    fontSize: 14,
+    color: 'white',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  timeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timeText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginLeft: 4,
+  },
+  distanceInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  distanceText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginLeft: 4,
+  },
+  actions: {
+    flexDirection: 'row',
+    backgroundColor: '#1f2937',
+    padding: 12,
+  },
+  declineButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#4b5563',
+    borderRadius: 6,
+    padding: 12,
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  declineText: {
+    color: 'white',
+    fontWeight: '500',
+  },
+  acceptButton: {
+    flex: 1,
+    backgroundColor: '#00C4CC',
+    borderRadius: 6,
+    padding: 12,
+    alignItems: 'center',
+  },
+  acceptText: {
+    color: 'white',
+    fontWeight: '500',
+  },
+});
 
 export default RideRequestCard;

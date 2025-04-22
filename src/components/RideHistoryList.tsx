@@ -1,8 +1,13 @@
 
 import React, { useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList 
+} from 'react-native';
 import { useRide } from '@/contexts/RideContext';
-import { CalendarIcon, Clock, MapPin } from 'lucide-react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import FilterRideHistory from './FilterRideHistory';
 
 const RideHistoryList: React.FC = () => {
@@ -99,61 +104,157 @@ const RideHistoryList: React.FC = () => {
     }
   };
   
-  return (
-    <Card className="bg-gray-800 border-gray-700">
-      <CardHeader className="pb-2">
-        <h3 className="text-lg font-medium text-white">Ride History</h3>
-      </CardHeader>
-      <CardContent>
-        <FilterRideHistory 
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          onResetFilters={resetFilters}
-        />
+  const renderRideItem = ({ item }: { item: any }) => (
+    <View style={styles.rideItem}>
+      <View style={styles.rideHeader}>
+        <View>
+          <Text style={styles.passengerName}>{item.passengerName || 'Unknown Passenger'}</Text>
+          <View style={styles.dateRow}>
+            <Ionicons name="calendar-outline" size={12} color="#9ca3af" />
+            <Text style={styles.dateText}>{item.formattedDate}</Text>
+          </View>
+        </View>
+        <Text style={styles.fareText}>EGP {item.fare.toFixed(2)}</Text>
+      </View>
+      
+      <View style={styles.locations}>
+        <View style={styles.locationRow}>
+          <View style={styles.locationDot}>
+            <View style={styles.pickupDot} />
+          </View>
+          <Text style={styles.locationText}>{item.pickupLocation?.address || 'Unknown location'}</Text>
+        </View>
         
-        {formattedRides.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            <p>No ride history matches your filters</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-700">
-            {formattedRides.map(ride => (
-              <div key={ride.id} className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h4 className="font-medium text-white">{ride.passengerName || 'Unknown Passenger'}</h4>
-                    <div className="flex items-center text-sm text-gray-400">
-                      <CalendarIcon className="h-3 w-3 mr-1" />
-                      <span>{ride.formattedDate}</span>
-                    </div>
-                  </div>
-                  <div className="text-[#00C4CC] font-bold">EGP {ride.fare.toFixed(2)}</div>
-                </div>
-                
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-start">
-                    <div className="min-w-8 flex justify-center pt-1">
-                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                    </div>
-                    <div className="text-sm text-gray-400">{ride.pickupLocation?.address || 'Unknown location'}</div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="min-w-8 flex justify-center pt-1">
-                      <div className="h-2 w-2 rounded-full bg-red-500"></div>
-                    </div>
-                    <div className="text-sm text-gray-400">{ride.dropoffLocation?.address || 'Unknown location'}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <View style={styles.locationRow}>
+          <View style={styles.locationDot}>
+            <View style={styles.dropoffDot} />
+          </View>
+          <Text style={styles.locationText}>{item.dropoffLocation?.address || 'Unknown location'}</Text>
+        </View>
+      </View>
+    </View>
+  );
+  
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Ride History</Text>
+      </View>
+      
+      <FilterRideHistory 
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        onResetFilters={resetFilters}
+      />
+      
+      {formattedRides.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>No ride history matches your filters</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={formattedRides}
+          renderItem={renderRideItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#111827',
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#374151',
+  },
+  header: {
+    padding: 16,
+    paddingBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: 'white',
+  },
+  listContent: {
+    paddingBottom: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  emptyText: {
+    color: '#9ca3af',
+  },
+  rideItem: {
+    padding: 16,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#374151',
+  },
+  rideHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  passengerName: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'white',
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginLeft: 4,
+  },
+  fareText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#00C4CC',
+  },
+  locations: {
+    marginTop: 12,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  locationDot: {
+    width: 32,
+    alignItems: 'center',
+    paddingTop: 4,
+  },
+  pickupDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#10b981', // green-500
+  },
+  dropoffDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ef4444', // red-500
+  },
+  locationText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    flex: 1,
+  },
+});
 
 export default RideHistoryList;

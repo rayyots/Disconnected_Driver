@@ -1,11 +1,13 @@
 
-import React from 'react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Input } from "@/components/ui/input";
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity,
+  TextInput
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface FilterRideHistoryProps {
   dateRange: { from: Date | undefined; to: Date | undefined };
@@ -22,15 +24,15 @@ const FilterRideHistory: React.FC<FilterRideHistoryProps> = ({
   setStatusFilter,
   onResetFilters
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = e.target.value ? new Date(e.target.value) : undefined;
+  const handleFromDateChange = (dateString: string) => {
+    const date = dateString ? new Date(dateString) : undefined;
     setDateRange({ ...dateRange, from: date });
   };
 
-  const handleToDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = e.target.value ? new Date(e.target.value) : undefined;
+  const handleToDateChange = (dateString: string) => {
+    const date = dateString ? new Date(dateString) : undefined;
     setDateRange({ ...dateRange, to: date });
   };
 
@@ -38,86 +40,190 @@ const FilterRideHistory: React.FC<FilterRideHistoryProps> = ({
     if (!date) return '';
     return date.toISOString().split('T')[0];
   };
+  
+  const hasActiveFilters = dateRange.from || dateRange.to || statusFilter;
 
   return (
-    <Collapsible
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      className="bg-gray-700 rounded-lg p-3 mb-4"
-    >
-      <div className="flex flex-row items-center justify-between">
-        <CollapsibleTrigger asChild>
-          <button className="p-2 flex flex-row items-center text-left bg-transparent border-0">
-            <Filter className="h-4 w-4 mr-2 text-gray-300" />
-            <span className="text-gray-300">Filters</span>
-            {isOpen ? (
-              <ChevronUp className="h-4 w-4 ml-2 text-gray-300" />
-            ) : (
-              <ChevronDown className="h-4 w-4 ml-2 text-gray-300" />
-            )}
-          </button>
-        </CollapsibleTrigger>
-        {(dateRange.from || dateRange.to || statusFilter) && (
-          <button
-            onClick={onResetFilters}
-            className="flex flex-row items-center bg-transparent border-0"
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.triggerButton}
+          onPress={() => setIsOpen(!isOpen)}
+        >
+          <Ionicons name="filter" size={16} color="#9ca3af" />
+          <Text style={styles.triggerText}>Filters</Text>
+          <Ionicons 
+            name={isOpen ? "chevron-up" : "chevron-down"} 
+            size={16} 
+            color="#9ca3af" 
+          />
+        </TouchableOpacity>
+        
+        {hasActiveFilters && (
+          <TouchableOpacity 
+            style={styles.resetButton}
+            onPress={onResetFilters}
           >
-            <X className="h-3 w-3 mr-1 text-gray-400" />
-            <span className="text-xs text-gray-400">Reset</span>
-          </button>
+            <Ionicons name="close" size={12} color="#9ca3af" />
+            <Text style={styles.resetText}>Reset</Text>
+          </TouchableOpacity>
         )}
-      </div>
+      </View>
 
-      <CollapsibleContent className="mt-3 space-y-4">
-        <div className="space-y-2">
-          <p className="text-sm text-gray-300">Date Range</p>
-          <div className="flex flex-row space-x-2">
-            <div className="flex-1 space-y-1">
-              <div className="flex flex-row items-center">
-                <CalendarIcon className="h-3 w-3 mr-1 text-gray-400" />
-                <span className="text-xs text-gray-400">From</span>
-              </div>
-              <Input
-                type="date"
-                value={formatDateForInput(dateRange.from)}
-                onChange={handleFromDateChange}
-                className="bg-gray-800 border-gray-600 text-white h-8 text-sm"
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex flex-row items-center">
-                <CalendarIcon className="h-3 w-3 mr-1 text-gray-400" />
-                <span className="text-xs text-gray-400">To</span>
-              </div>
-              <Input
-                type="date"
-                value={formatDateForInput(dateRange.to)}
-                onChange={handleToDateChange}
-                className="bg-gray-800 border-gray-600 text-white h-8 text-sm"
-              />
-            </div>
-          </div>
-        </div>
+      {isOpen && (
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Date Range</Text>
+            <View style={styles.dateInputs}>
+              <View style={styles.dateInputContainer}>
+                <View style={styles.dateLabel}>
+                  <Ionicons name="calendar" size={12} color="#9ca3af" />
+                  <Text style={styles.dateLabelText}>From</Text>
+                </View>
+                <TextInput
+                  style={styles.dateInput}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#6b7280"
+                  value={formatDateForInput(dateRange.from)}
+                  onChangeText={handleFromDateChange}
+                />
+              </View>
+              
+              <View style={styles.dateInputContainer}>
+                <View style={styles.dateLabel}>
+                  <Ionicons name="calendar" size={12} color="#9ca3af" />
+                  <Text style={styles.dateLabelText}>To</Text>
+                </View>
+                <TextInput
+                  style={styles.dateInput}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#6b7280"
+                  value={formatDateForInput(dateRange.to)}
+                  onChangeText={handleToDateChange}
+                />
+              </View>
+            </View>
+          </View>
 
-        <div className="space-y-2">
-          <p className="text-sm text-gray-300">Ride Status</p>
-          <ToggleGroup 
-            type="single" 
-            value={statusFilter || ""}
-            onValueChange={(value) => setStatusFilter(value || null)}
-            className="flex flex-row flex-wrap gap-1"
-          >
-            <ToggleGroupItem value="completed" className="bg-gray-800 text-xs h-7 px-2">
-              <span>Completed</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem value="cancelled" className="bg-gray-800 text-xs h-7 px-2">
-              <span>Cancelled</span>
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Ride Status</Text>
+            <View style={styles.statusButtons}>
+              <TouchableOpacity 
+                style={[
+                  styles.statusButton,
+                  statusFilter === 'completed' && styles.activeStatusButton
+                ]}
+                onPress={() => setStatusFilter(statusFilter === 'completed' ? null : 'completed')}
+              >
+                <Text style={styles.statusButtonText}>Completed</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[
+                  styles.statusButton,
+                  statusFilter === 'cancelled' && styles.activeStatusButton
+                ]}
+                onPress={() => setStatusFilter(statusFilter === 'cancelled' ? null : 'cancelled')}
+              >
+                <Text style={styles.statusButtonText}>Cancelled</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  triggerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
+  triggerText: {
+    color: '#9ca3af',
+    marginHorizontal: 8,
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+  },
+  resetText: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginLeft: 4,
+  },
+  content: {
+    marginTop: 12,
+  },
+  section: {
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginBottom: 8,
+  },
+  dateInputs: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  dateInputContainer: {
+    flex: 1,
+  },
+  dateLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  dateLabelText: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginLeft: 4,
+  },
+  dateInput: {
+    backgroundColor: '#111827',
+    borderWidth: 1,
+    borderColor: '#374151',
+    borderRadius: 4,
+    color: 'white',
+    height: 32,
+    fontSize: 14,
+    paddingHorizontal: 8,
+  },
+  statusButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  statusButton: {
+    backgroundColor: '#111827',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    height: 28,
+  },
+  activeStatusButton: {
+    backgroundColor: '#00C4CC',
+  },
+  statusButtonText: {
+    fontSize: 12,
+    color: 'white',
+  },
+});
 
 export default FilterRideHistory;
