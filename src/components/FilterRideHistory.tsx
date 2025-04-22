@@ -1,16 +1,11 @@
 
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
-import { DatePickerInput } from '@/components/ui/date-picker-input';
-import { Filter, ChevronDown, ChevronUp, X, Calendar } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { styled } from 'nativewind';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
-const StyledTouchableOpacity = styled(TouchableOpacity);
+import { Input } from "@/components/ui/input";
 
 interface FilterRideHistoryProps {
   dateRange: { from: Date | undefined; to: Date | undefined };
@@ -29,15 +24,17 @@ const FilterRideHistory: React.FC<FilterRideHistoryProps> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleFromDateChange = (date: Date | undefined) => {
+  const handleFromDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
     setDateRange({ ...dateRange, from: date });
   };
 
-  const handleToDateChange = (date: Date | undefined) => {
+  const handleToDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
     setDateRange({ ...dateRange, to: date });
   };
 
-  const formatDateForDisplay = (date: Date | undefined): string => {
+  const formatDateForInput = (date: Date | undefined): string => {
     if (!date) return '';
     return date.toISOString().split('T')[0];
   };
@@ -48,74 +45,76 @@ const FilterRideHistory: React.FC<FilterRideHistoryProps> = ({
       onOpenChange={setIsOpen}
       className="bg-gray-700 rounded-lg p-3 mb-4"
     >
-      <StyledView className="flex-row items-center justify-between">
+      <div className="flex flex-row items-center justify-between">
         <CollapsibleTrigger asChild>
-          <StyledTouchableOpacity className="p-2 flex-row items-center">
+          <button className="p-2 flex flex-row items-center text-left bg-transparent border-0">
             <Filter className="h-4 w-4 mr-2 text-gray-300" />
-            <StyledText className="text-gray-300">Filters</StyledText>
+            <span className="text-gray-300">Filters</span>
             {isOpen ? (
               <ChevronUp className="h-4 w-4 ml-2 text-gray-300" />
             ) : (
               <ChevronDown className="h-4 w-4 ml-2 text-gray-300" />
             )}
-          </StyledTouchableOpacity>
+          </button>
         </CollapsibleTrigger>
         {(dateRange.from || dateRange.to || statusFilter) && (
-          <StyledTouchableOpacity
-            onPress={onResetFilters}
-            className="flex-row items-center"
+          <button
+            onClick={onResetFilters}
+            className="flex flex-row items-center bg-transparent border-0"
           >
             <X className="h-3 w-3 mr-1 text-gray-400" />
-            <StyledText className="text-xs text-gray-400">Reset</StyledText>
-          </StyledTouchableOpacity>
+            <span className="text-xs text-gray-400">Reset</span>
+          </button>
         )}
-      </StyledView>
+      </div>
 
       <CollapsibleContent className="mt-3 space-y-4">
-        <StyledView className="space-y-2">
-          <StyledText className="text-sm text-gray-300">Date Range</StyledText>
-          <StyledView className="flex-row space-x-2">
-            <StyledView className="flex-1 space-y-1">
-              <StyledView className="flex-row items-center">
-                <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-                <StyledText className="text-xs text-gray-400">From</StyledText>
-              </StyledView>
-              <DatePickerInput
-                value={dateRange.from}
+        <div className="space-y-2">
+          <p className="text-sm text-gray-300">Date Range</p>
+          <div className="flex flex-row space-x-2">
+            <div className="flex-1 space-y-1">
+              <div className="flex flex-row items-center">
+                <CalendarIcon className="h-3 w-3 mr-1 text-gray-400" />
+                <span className="text-xs text-gray-400">From</span>
+              </div>
+              <Input
+                type="date"
+                value={formatDateForInput(dateRange.from)}
                 onChange={handleFromDateChange}
                 className="bg-gray-800 border-gray-600 text-white h-8 text-sm"
               />
-            </StyledView>
-            <StyledView className="flex-1 space-y-1">
-              <StyledView className="flex-row items-center">
-                <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-                <StyledText className="text-xs text-gray-400">To</StyledText>
-              </StyledView>
-              <DatePickerInput
-                value={dateRange.to}
+            </div>
+            <div className="flex-1 space-y-1">
+              <div className="flex flex-row items-center">
+                <CalendarIcon className="h-3 w-3 mr-1 text-gray-400" />
+                <span className="text-xs text-gray-400">To</span>
+              </div>
+              <Input
+                type="date"
+                value={formatDateForInput(dateRange.to)}
                 onChange={handleToDateChange}
                 className="bg-gray-800 border-gray-600 text-white h-8 text-sm"
               />
-            </StyledView>
-          </StyledView>
-        </StyledView>
+            </div>
+          </div>
+        </div>
 
-        <StyledView className="space-y-2">
-          <StyledText className="text-sm text-gray-300">Ride Status</StyledText>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-300">Ride Status</p>
           <ToggleGroup 
             type="single" 
             value={statusFilter || ""}
             onValueChange={(value) => setStatusFilter(value || null)}
-            className="flex-row flex-wrap gap-1"
+            className="flex flex-row flex-wrap gap-1"
           >
             <ToggleGroupItem value="completed" className="bg-gray-800 text-xs h-7 px-2">
-              <StyledText>Completed</StyledText>
+              <span>Completed</span>
             </ToggleGroupItem>
             <ToggleGroupItem value="cancelled" className="bg-gray-800 text-xs h-7 px-2">
-              <StyledText>Cancelled</StyledText>
+              <span>Cancelled</span>
             </ToggleGroupItem>
           </ToggleGroup>
-        </StyledView>
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );
