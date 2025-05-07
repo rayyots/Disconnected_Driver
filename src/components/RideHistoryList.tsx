@@ -1,10 +1,11 @@
+
 import React, { useMemo, useState } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   FlatList 
-} from 'react-native';
+} from '@/utils/react-native-adapter';
 import { useRide } from '@/contexts/RideContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FilterRideHistory from './FilterRideHistory';
