@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from 'react';
 import { 
   View, 
@@ -26,43 +25,7 @@ const RideHistoryList: React.FC = () => {
     setStatusFilter(null);
   };
   
-  // Memoize formatted and filtered ride data
-  const formattedRides = useMemo(() => {
-    // First format the rides
-    const formatted = rideHistory.map(ride => ({
-      ...ride,
-      formattedDate: formatDate(ride.endTime)
-    }));
-    
-    // Then apply filters
-    return formatted.filter(ride => {
-      // Apply date range filter if set
-      if (dateRange.from && ride.endTime) {
-        const from = new Date(dateRange.from);
-        from.setHours(0, 0, 0, 0);
-        
-        const rideDate = new Date(ride.endTime);
-        if (rideDate < from) return false;
-      }
-      
-      if (dateRange.to && ride.endTime) {
-        const to = new Date(dateRange.to);
-        to.setHours(23, 59, 59, 999);
-        
-        const rideDate = new Date(ride.endTime);
-        if (rideDate > to) return false;
-      }
-      
-      // Apply status filter if set
-      if (statusFilter && ride.status !== statusFilter) {
-        return false;
-      }
-      
-      return true;
-    });
-  }, [rideHistory, dateRange, statusFilter]);
-  
-  // Format date for display
+  // Format date for display - extracted outside the useMemo to avoid initialization issues
   const formatDate = (date: Date | undefined) => {
     if (!date) return 'Unknown';
     
@@ -103,6 +66,39 @@ const RideHistoryList: React.FC = () => {
       return 'Invalid date';
     }
   };
+  
+  // Memoize formatted and filtered ride data - fixed the variable initialization issue
+  const formattedRides = useMemo(() => {
+    // First format the rides
+    return rideHistory.map(ride => ({
+      ...ride,
+      formattedDate: formatDate(ride.endTime)
+    })).filter(ride => {
+      // Apply date range filter if set
+      if (dateRange.from && ride.endTime) {
+        const from = new Date(dateRange.from);
+        from.setHours(0, 0, 0, 0);
+        
+        const rideDate = new Date(ride.endTime);
+        if (rideDate < from) return false;
+      }
+      
+      if (dateRange.to && ride.endTime) {
+        const to = new Date(dateRange.to);
+        to.setHours(23, 59, 59, 999);
+        
+        const rideDate = new Date(ride.endTime);
+        if (rideDate > to) return false;
+      }
+      
+      // Apply status filter if set
+      if (statusFilter && ride.status !== statusFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [rideHistory, dateRange, statusFilter]);
   
   const renderRideItem = ({ item }: { item: any }) => (
     <View style={styles.rideItem}>
