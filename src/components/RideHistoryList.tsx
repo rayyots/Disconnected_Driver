@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useRide } from '@/contexts/RideContext';
@@ -43,7 +44,7 @@ const RideHistoryList: React.FC = () => {
     });
   };
   
-  if (rideHistory.length === 0) {
+  if (!rideHistory || rideHistory.length === 0) {
     return (
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader className="pb-2">
@@ -65,36 +66,44 @@ const RideHistoryList: React.FC = () => {
       </CardHeader>
       <CardContent className="p-0">
         <div className="divide-y divide-gray-700">
-          {rideHistory.map(ride => (
-            <div key={ride.id} className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="font-medium text-white">{ride.rider.name}</h4>
-                  <div className="flex items-center text-sm text-gray-400">
-                    <CalendarIcon className="h-3 w-3 mr-1" />
-                    <span>{formatDate(ride.endTime)}</span>
+          {rideHistory.map(ride => {
+            // Add safety checks for potentially undefined properties
+            const rider = ride?.rider || { name: 'Unknown' };
+            const pickupAddress = ride?.pickupLocation?.address || 'Unknown location';
+            const dropoffAddress = ride?.dropoffLocation?.address || 'Unknown location';
+            const fare = ride?.fare || 0;
+            
+            return (
+              <div key={ride.id} className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-medium text-white">{rider.name}</h4>
+                    <div className="flex items-center text-sm text-gray-400">
+                      <CalendarIcon className="h-3 w-3 mr-1" />
+                      <span>{formatDate(ride.endTime)}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="text-[#00C4CC] font-bold">${ride.fare.toFixed(2)}</div>
-              </div>
-              
-              <div className="mt-3 space-y-2">
-                <div className="flex items-start">
-                  <div className="min-w-8 flex justify-center pt-1">
-                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  </div>
-                  <div className="text-sm text-gray-400">{ride.pickupLocation.address}</div>
+                  <div className="text-[#00C4CC] font-bold">${fare.toFixed(2)}</div>
                 </div>
                 
-                <div className="flex items-start">
-                  <div className="min-w-8 flex justify-center pt-1">
-                    <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-start">
+                    <div className="min-w-8 flex justify-center pt-1">
+                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="text-sm text-gray-400">{pickupAddress}</div>
                   </div>
-                  <div className="text-sm text-gray-400">{ride.dropoffLocation.address}</div>
+                  
+                  <div className="flex items-start">
+                    <div className="min-w-8 flex justify-center pt-1">
+                      <div className="h-2 w-2 rounded-full bg-red-500"></div>
+                    </div>
+                    <div className="text-sm text-gray-400">{dropoffAddress}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </CardContent>
     </Card>
