@@ -2,11 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { ActiveRide } from '@/contexts/RideContext';
+import { Ride, RideStatus } from '@/contexts/RideContext';
 import { Clock, Navigation, User, MapPin, Check } from 'lucide-react';
 
 interface ActiveRideCardProps {
-  ride: ActiveRide;
+  ride: Ride;
   onArriveAtPickup: () => void;
   onStartRide: () => void;
   onCompleteRide: () => void;
@@ -92,11 +92,20 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
   // Determine which location to highlight based on ride status
   const highlightPickup = ride.status === 'accepted';
 
+  // Add safety checks for potentially undefined properties
+  const passengerName = ride.passengerName || 'Unknown Passenger';
+  const passengerRating = ride.passengerRating || 0;
+  const pickupAddress = ride.pickupLocation?.address || 'Unknown location';
+  const dropoffAddress = ride.dropoffLocation?.address || 'Unknown location';
+  const fare = ride.fare || 0;
+  const estimatedTime = ride.estimatedTime || 0;
+  const distance = ride.distance || 0;
+
   return (
     <Card className="w-full bg-gray-800 border-gray-700 overflow-hidden">
       <div className="bg-[#00C4CC] p-3 flex justify-between items-center">
         <h3 className="font-medium text-white">{getStatusHeader()}</h3>
-        <div className="text-white font-bold">${ride.fare.toFixed(2)}</div>
+        <div className="text-white font-bold">${fare.toFixed(2)}</div>
       </div>
       
       <CardContent className="p-4">
@@ -105,8 +114,8 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
             <User className="h-5 w-5 text-[#00C4CC]" />
           </div>
           <div>
-            <h3 className="font-medium text-white">{ride.rider.name}</h3>
-            <div className="text-sm text-gray-400">Rating: {ride.rider.rating}★</div>
+            <h3 className="font-medium text-white">{passengerName}</h3>
+            <div className="text-sm text-gray-400">Rating: {passengerRating}★</div>
           </div>
         </div>
         
@@ -117,7 +126,7 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
             </div>
             <div>
               <div className="text-sm text-gray-400">Pickup</div>
-              <div className="text-white">{ride.pickupLocation.address}</div>
+              <div className="text-white">{pickupAddress}</div>
             </div>
           </div>
           
@@ -127,7 +136,7 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
             </div>
             <div>
               <div className="text-sm text-gray-400">Dropoff</div>
-              <div className="text-white">{ride.dropoffLocation.address}</div>
+              <div className="text-white">{dropoffAddress}</div>
             </div>
           </div>
         </div>
@@ -135,11 +144,11 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
         <div className="flex justify-between text-sm text-gray-400">
           <div className="flex items-center">
             <Clock className="h-4 w-4 mr-1" />
-            <span>{ride.estimatedTime} mins</span>
+            <span>{estimatedTime} mins</span>
           </div>
           <div className="flex items-center">
             <Navigation className="h-4 w-4 mr-1" />
-            <span>{ride.distance.toFixed(1)} mi</span>
+            <span>{distance.toFixed(1)} mi</span>
           </div>
         </div>
       </CardContent>

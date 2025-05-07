@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useRide } from '@/contexts/RideContext';
@@ -68,7 +67,7 @@ const RideHistoryList: React.FC = () => {
         <div className="divide-y divide-gray-700">
           {rideHistory.map(ride => {
             // Add safety checks for potentially undefined properties
-            const rider = ride?.rider || { name: 'Unknown' };
+            const passengerName = ride?.passengerName || 'Unknown';
             const pickupAddress = ride?.pickupLocation?.address || 'Unknown location';
             const dropoffAddress = ride?.dropoffLocation?.address || 'Unknown location';
             const fare = ride?.fare || 0;
@@ -77,7 +76,7 @@ const RideHistoryList: React.FC = () => {
               <div key={ride.id} className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <h4 className="font-medium text-white">{rider.name}</h4>
+                    <h4 className="font-medium text-white">{passengerName}</h4>
                     <div className="flex items-center text-sm text-gray-400">
                       <CalendarIcon className="h-3 w-3 mr-1" />
                       <span>{formatDate(ride.endTime)}</span>
