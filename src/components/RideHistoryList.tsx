@@ -82,7 +82,7 @@ const RideHistoryList: React.FC = () => {
                       <span>{formatDate(ride.endTime)}</span>
                     </div>
                   </div>
-                  <div className="text-[#00C4CC] font-bold">${fare.toFixed(2)}</div>
+                  <div className="text-[#00C4CC] font-bold">EGP {fare.toFixed(2)}</div>
                 </div>
                 
                 <div className="mt-3 space-y-2">

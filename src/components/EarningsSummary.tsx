@@ -60,7 +60,7 @@ const EarningsSummary: React.FC = () => {
             style={{ transitionDelay: '100ms' }}
           >
             <p className="text-gray-400 text-sm">Today</p>
-            <p className="text-white font-bold text-xl">${todayEarnings.toFixed(2)}</p>
+            <p className="text-white font-bold text-xl">EGP {todayEarnings.toFixed(2)}</p>
           </div>
           <div 
             className={`p-4 bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg transform transition-all duration-500 ${
@@ -69,7 +69,7 @@ const EarningsSummary: React.FC = () => {
             style={{ transitionDelay: '200ms' }}
           >
             <p className="text-gray-400 text-sm">This Week</p>
-            <p className="text-white font-bold text-xl">${weekEarnings.toFixed(2)}</p>
+            <p className="text-white font-bold text-xl">EGP {weekEarnings.toFixed(2)}</p>
           </div>
           <div 
             className={`p-4 bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg transform transition-all duration-500 ${
@@ -78,7 +78,7 @@ const EarningsSummary: React.FC = () => {
             style={{ transitionDelay: '300ms' }}
           >
             <p className="text-gray-400 text-sm">Total Earnings</p>
-            <p className="text-white font-bold text-xl">${totalEarnings.toFixed(2)}</p>
+            <p className="text-white font-bold text-xl">EGP {totalEarnings.toFixed(2)}</p>
           </div>
           <div 
             className={`p-4 bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg transform transition-all duration-500 ${

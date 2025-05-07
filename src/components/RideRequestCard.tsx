@@ -60,8 +60,8 @@ const RideRequestCard: React.FC<RideRequestCardProps> = ({
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[#00C4CC] font-bold">${fare.toFixed(2)}</div>
-            <div className="text-sm text-gray-400">{distance.toFixed(1)} miles</div>
+            <div className="text-[#00C4CC] font-bold">EGP {fare.toFixed(2)}</div>
+            <div className="text-sm text-gray-400">{distance.toFixed(1)} Kms</div>
           </div>
         </div>
         
@@ -94,7 +94,7 @@ const RideRequestCard: React.FC<RideRequestCardProps> = ({
           </div>
           <div className="flex items-center">
             <Navigation className="h-4 w-4 mr-1" />
-            <span>{distance.toFixed(1)} mi</span>
+            <span>{distance.toFixed(1)} Km</span>
           </div>
         </div>
       </CardContent>

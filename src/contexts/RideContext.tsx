@@ -58,17 +58,17 @@ const dummyRideRequests: RideRequest[] = [
   {
     id: 'request1',
     pickupLocation: {
-      address: '123 Main St',
+      address: 'Sakr Koreesh Mall',
       lat: 37.7749,
       lng: -122.4194
     },
     dropoffLocation: {
-      address: '456 Market St',
+      address: 'Maadi Center',
       lat: 37.7922,
       lng: -122.3984
     },
     rider: {
-      name: 'John Smith',
+      name: 'Sameer William',
       rating: 4.8
     },
     fare: 15.75,
@@ -78,17 +78,17 @@ const dummyRideRequests: RideRequest[] = [
   {
     id: 'request2',
     pickupLocation: {
-      address: '789 Howard St',
+      address: 'Downtown mall',
       lat: 37.7835,
       lng: -122.3967
     },
     dropoffLocation: {
-      address: '101 California St',
+      address: 'Post Office',
       lat: 37.7938,
       lng: -122.3968
     },
     rider: {
-      name: 'Emma Davis',
+      name: 'Salah Ahmed',
       rating: 4.9
     },
     fare: 12.50,
@@ -223,7 +223,7 @@ export const RideProvider = ({ children }: { children: ReactNode }) => {
     setRideHistory(prev => [completedRide, ...prev]);
     setActiveRide(null);
     
-    toast.success(`Ride completed! Earned $${completedRide.fare.toFixed(2)}`, {
+    toast.success(`Ride completed! Earned EGP ${completedRide.fare.toFixed(2)}`, {
       duration: 4000,
     });
   };
