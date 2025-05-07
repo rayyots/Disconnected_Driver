@@ -2,109 +2,105 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import Logo from '@/components/Logo';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import Logo from '@/components/Logo';
-import { useToast } from '@/hooks/use-toast';
+import { LogIn } from 'lucide-react';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+const LoginPage: React.FC = () => {
+  const { allDrivers, login } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: "Error",
-        description: "Please enter both email and password",
-        variant: "destructive",
-      });
+    setError(null);
+    setLoading(true);
+
+    // Basic phone format check
+    const phoneTrimmed = phone.trim();
+    const driver = allDrivers.find(
+      (d) => d.phone.replace(/[\s()-]/g, '') === phoneTrimmed.replace(/[\s()-]/g, '')
+    );
+
+    if (!driver) {
+      setError('No driver found with this phone number.');
+      setLoading(false);
       return;
     }
-    
-    setIsLoading(true);
-    
+
     try {
-      await login(email, password);
+      await login(driver.id);
       navigate('/');
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password",
-        variant: "destructive",
-      });
+    } catch (err) {
+      setError('Failed to log in. Try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Logo size="lg" />
-        </div>
-        
-        <Card className="bg-[#1A252F] border-gray-700 text-white">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Driver Login</CardTitle>
-            <CardDescription className="text-center text-gray-400">
-              Enter your credentials to access your account
-            </CardDescription>
-          </CardHeader>
-          
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">Email</Label>
-                <Input 
-                  id="email"
-                  type="email"
-                  placeholder="driver@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-gray-800 border-gray-700 text-white"
-                  autoComplete="email"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-300">Password</Label>
-                <Input 
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-gray-800 border-gray-700 text-white"
-                  autoComplete="current-password"
-                />
-              </div>
-            </CardContent>
-            
-            <CardFooter>
-              <Button 
-                type="submit" 
-                className="w-full bg-[#00C4CC] hover:bg-[#00B3BB]" 
-                disabled={isLoading}
-              >
-                {isLoading ? "Logging in..." : "Log in"}
-              </Button>
-            </CardFooter>
-          </form>
-          
-          <div className="px-6 pb-6 pt-2 text-xs text-center text-gray-400">
-            For demonstration purposes, use any email and password combination.
-          </div>
-        </Card>
+    <div className="min-h-screen bg-[#1A252F] flex flex-col items-center justify-center p-4">
+      <div className="mb-8 animate-fade-in">
+        <Logo size="lg" />
       </div>
+      <Card 
+        className="w-full max-w-sm border-none overflow-hidden animate-scale-in shadow-lg"
+        style={{background: "linear-gradient(102.3deg, #9379fa 5.9%, #6E59A5 100%)"}}>
+        <CardHeader className="text-center text-white pb-2">
+          <CardTitle className="text-2xl font-bold">Driver Login</CardTitle>
+          <p className="text-gray-200">Enter your phone number</p>
+        </CardHeader>
+        <CardContent className="p-6 flex flex-col gap-4">
+          <form onSubmit={handleLogin} className="flex flex-col gap-4 animate-fade-in">
+            <div>
+              <Input
+                placeholder="+1 (555) 123-4567"
+                autoFocus
+                value={phone}
+                disabled={loading}
+                onChange={(e) => setPhone(e.target.value)}
+                className="bg-white/20 text-white border-white/30 placeholder-gray-300 focus:bg-white/30 focus:ring-primary"
+                type="text"
+              />
+            </div>
+            {error && (
+              <div className="text-red-300 text-sm font-semibold animate-fade-in">{error}</div>
+            )}
+            <Button
+              type="submit"
+              disabled={loading || !phone.trim()}
+              className="w-full bg-white/20 border-white/30 hover:bg-white/30 text-white transition-all font-bold gap-2"
+            >
+              {loading ? (
+                <span className="animate-pulse">Logging in...</span>
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </>
+              )}
+            </Button>
+          </form>
+          <div className="mt-2 text-xs text-white/80 text-center">
+            Demo numbers:<br />
+            {allDrivers.map((d, i) => (
+              <span key={d.id}>
+                {d.name}: <span className="font-mono">{d.phone}</span>
+                {i < allDrivers.length - 1 && <br />}
+              </span>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <p className="mt-8 text-sm text-gray-400 animate-fade-in">
+        This is a demo app. Enter a valid driver's phone number.
+      </p>
     </div>
   );
-}
+};
+
+export default LoginPage;

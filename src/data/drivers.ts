@@ -1,214 +1,211 @@
 
-import { Driver } from "@/contexts/AuthContext";
-import { Ride } from "@/contexts/rideTypes";
+import { Driver } from '@/contexts/AuthContext';
+import { Ride, RideStatus } from '@/contexts/RideContext';
 
 export const driverProfiles: Driver[] = [
   {
-    id: "driver-001",
-    name: "John Smith",
-    phone: "555-123-4567",
-    email: "john.smith@example.com",
-    rating: 4.8,
-    totalRides: 1284,
-    vehicle: {
-      model: "Tesla Model 3",
-      color: "Black",
-      plateNumber: "EV-2023",
+    id: "driver1",
+    name: "Alexandra Foster",
+    phone: "+1 (555) 483-2942",
+    rating: 4.92,
+    totalRides: 289,
+    avatarUrl: "https://randomuser.me/api/portraits/women/68.jpg",
+    carDetails: {
+      model: "Toyota Camry 2021",
+      color: "Deep Blue",
+      plateNumber: "ABC-4567"
     },
-    isOnline: true,
-    earnings: 4850.75,
+    isOnline: false,
+    earnings: 2843.75
   },
   {
-    id: "driver-002",
-    name: "Emily Johnson",
-    phone: "555-987-6543",
-    email: "emily.j@example.com",
-    rating: 4.9,
-    totalRides: 843,
-    vehicle: {
-      model: "Toyota Prius",
+    id: "driver2",
+    name: "Marcus Chen",
+    phone: "+1 (555) 112-3789",
+    rating: 4.87,
+    totalRides: 427,
+    avatarUrl: "https://randomuser.me/api/portraits/men/22.jpg",
+    carDetails: {
+      model: "Honda Accord 2022",
       color: "Silver",
-      plateNumber: "ECO-123",
+      plateNumber: "XYZ-8901"
     },
     isOnline: false,
-    earnings: 3120.50,
+    earnings: 4125.50
   },
   {
-    id: "driver-003",
-    name: "Michael Chen",
-    phone: "555-456-7890",
-    email: "m.chen@example.com",
-    rating: 4.7,
-    totalRides: 652,
-    vehicle: {
-      model: "Honda Civic",
-      color: "Blue",
-      plateNumber: "HC-7890",
-    },
-    isOnline: false,
-    earnings: 2790.25,
-  },
-  {
-    id: "driver-004",
-    name: "Sofia Garcia",
-    phone: "555-789-0123",
-    email: "sofia.g@example.com",
-    rating: 4.6,
-    totalRides: 421,
-    vehicle: {
-      model: "Chevrolet Bolt",
-      color: "White",
-      plateNumber: "BOLT-21",
-    },
-    isOnline: true,
-    earnings: 1950.75,
-  },
-  {
-    id: "driver-005",
-    name: "David Wilson",
-    phone: "555-234-5678",
-    email: "d.wilson@example.com",
-    rating: 4.5,
-    totalRides: 375,
-    vehicle: {
-      model: "Ford Escape",
+    id: "driver3",
+    name: "Sophia Rodriguez",
+    phone: "+1 (555) 329-6710",
+    rating: 4.95,
+    totalRides: 512,
+    avatarUrl: "https://randomuser.me/api/portraits/women/45.jpg",
+    carDetails: {
+      model: "Tesla Model 3",
       color: "Red",
-      plateNumber: "FE-5678",
+      plateNumber: "ELT-5432"
     },
-    isOnline: true,
-    earnings: 1675.50,
+    isOnline: false,
+    earnings: 5237.25
   },
+  {
+    id: "driver4",
+    name: "James Wilson",
+    phone: "+1 (555) 778-1235",
+    rating: 4.79,
+    totalRides: 194,
+    avatarUrl: "https://randomuser.me/api/portraits/men/32.jpg",
+    carDetails: {
+      model: "Ford Escape 2021",
+      color: "White",
+      plateNumber: "FRD-9876"
+    },
+    isOnline: false,
+    earnings: 2105.50
+  },
+  {
+    id: "driver5",
+    name: "Olivia Johnson",
+    phone: "+1 (555) 663-4501",
+    rating: 4.91,
+    totalRides: 351,
+    avatarUrl: "https://randomuser.me/api/portraits/women/28.jpg",
+    carDetails: {
+      model: "Hyundai Tucson 2022",
+      color: "Forest Green",
+      plateNumber: "HYN-1122"
+    },
+    isOnline: false,
+    earnings: 3750.75
+  }
 ];
 
-// Generate a random ride history for a given driver ID
+// Create unique ride histories for each driver
 export const generateRideHistory = (driverId: string): Ride[] => {
-  // Generate a set of past rides for the driver
-  const pastRides: Ride[] = [
+  const baseRides: Ride[] = [
     {
-      id: "ride-001",
-      pickupLocation: { 
-        address: "Park Avenue",
-        lat: 37.7749,
-        lng: -122.4194
-      },
-      dropoffLocation: { 
-        address: "Downtown Square",
-        lat: 37.7899,
-        lng: -122.4021
-      },
-      passengerName: "Alex Johnson",
-      passengerRating: 4.7,
-      fare: 25.50,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
-      status: "completed",
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2 + 1000 * 60 * 25), // 25 mins after pickup
-      distance: 3.2,
+      id: "ride1",
+      pickupLocation: { address: "123 Main St" },
+      dropoffLocation: { address: "456 Market St" },
+      fare: 15.75,
+      date: new Date(2025, 3, 18, 9, 30),
+      status: "completed" as RideStatus,
+      passengerName: "John Smith",
+      distance: 4.2
     },
     {
-      id: "ride-002",
-      pickupLocation: { 
-        address: "Central Mall",
-        lat: 37.7833,
-        lng: -122.4167
-      },
-      dropoffLocation: { 
-        address: "Green Heights",
-        lat: 37.7923,
-        lng: -122.4321
-      },
-      passengerName: "Sarah Lee",
-      passengerRating: 4.9,
-      fare: 18.75,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-      status: "completed",
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 24 + 1000 * 60 * 15), // 15 mins after pickup
-      distance: 2.1,
-    },
-    {
-      id: "ride-003",
-      pickupLocation: { 
-        address: "Tech Park",
-        lat: 37.7849,
-        lng: -122.4294
-      },
-      dropoffLocation: { 
-        address: "Harbor View",
-        lat: 37.8079,
-        lng: -122.4094
-      },
-      passengerName: "Michael Brown",
-      passengerRating: 4.5,
-      fare: 32.20,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 10), // 10 hours ago
-      status: "completed",
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 10 + 1000 * 60 * 28), // 28 mins after pickup
-      distance: 3.8,
-    },
-    {
-      id: "ride-004",
-      pickupLocation: { 
-        address: "Sunset Apartments",
-        lat: 37.7569,
-        lng: -122.4334
-      },
-      dropoffLocation: { 
-        address: "City Hospital",
-        lat: 37.7629,
-        lng: -122.4584
-      },
-      passengerName: "Jessica Wilson",
-      passengerRating: 4.8,
-      fare: 15.30,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
-      status: "completed",
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 5 + 1000 * 60 * 12), // 12 mins after pickup
-      distance: 1.5,
-    },
-    {
-      id: "ride-005",
-      pickupLocation: { 
-        address: "Grand Hotel",
-        lat: 37.7879,
-        lng: -122.4074
-      },
-      dropoffLocation: { 
-        address: "Airport Terminal",
-        lat: 37.7639,
-        lng: -122.3924
-      },
-      passengerName: "Robert Zhang",
-      passengerRating: 4.6,
-      fare: 45.80,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-      status: "completed",
-      endTime: new Date(Date.now() - 1000 * 60 * 60 * 2 + 1000 * 60 * 35), // 35 mins after pickup
-      distance: 5.7,
-    },
-    {
-      id: "ride-006",
-      pickupLocation: { 
-        address: "University Campus",
-        lat: 37.7749,
-        lng: -122.4194
-      },
-      dropoffLocation: { 
-        address: "Tech Park",
-        lat: 37.7849,
-        lng: -122.4294
-      },
+      id: "ride2",
+      pickupLocation: { address: "789 Park Ave" },
+      dropoffLocation: { address: "101 Downtown Blvd" },
+      fare: 23.50,
+      date: new Date(2025, 3, 19, 14, 15),
+      status: "completed" as RideStatus,
       passengerName: "Emma Davis",
-      passengerRating: 4.7,
-      fare: 12.50,
-      date: new Date(Date.now() - 1000 * 60 * 30), // 30 mins ago
-      status: "cancelled",
-      endTime: new Date(Date.now() - 1000 * 60 * 25), // 25 mins ago
-      distance: 1.2,
+      distance: 7.8
+    },
+    {
+      id: "ride3",
+      pickupLocation: { address: "202 College St" },
+      dropoffLocation: { address: "303 Union Square" },
+      fare: 12.25,
+      date: new Date(2025, 3, 20, 17, 45),
+      status: "completed" as RideStatus,
+      passengerName: "Michael Johnson",
+      distance: 3.5
+    },
+    {
+      id: "ride4",
+      pickupLocation: { address: "404 Pine St" },
+      dropoffLocation: { address: "505 Broadway" },
+      fare: 30.00,
+      date: new Date(2025, 3, 21, 8, 0),
+      status: "completed" as RideStatus,
+      passengerName: "Sarah Williams",
+      distance: 9.1
     }
   ];
-  
-  // Filter based on driver ID if needed
-  // In this simple implementation, we're just returning the same set for any driver ID
-  // but in a real app, you would filter rides based on the driver ID
-  
-  return pastRides;
+
+  // Customize rides based on driver ID to create unique histories
+  switch(driverId) {
+    case "driver1":
+      return [
+        ...baseRides,
+        {
+          id: "ride5",
+          pickupLocation: { address: "606 Sunset Blvd" },
+          dropoffLocation: { address: "707 Ocean Ave" },
+          fare: 18.25,
+          date: new Date(2025, 3, 21, 19, 30),
+          status: "completed" as RideStatus,
+          passengerName: "David Miller",
+          distance: 5.3
+        }
+      ];
+    case "driver2":
+      return [
+        ...baseRides.slice(1),
+        {
+          id: "ride6",
+          pickupLocation: { address: "808 Tech Park" },
+          dropoffLocation: { address: "909 Innovation Dr" },
+          fare: 27.50,
+          date: new Date(2025, 3, 21, 12, 15),
+          status: "completed" as RideStatus,
+          passengerName: "Jennifer Lee",
+          distance: 8.7
+        },
+        {
+          id: "ride7",
+          pickupLocation: { address: "110 Medical Center" },
+          dropoffLocation: { address: "111 Research Blvd" },
+          fare: 22.00,
+          date: new Date(2025, 3, 21, 15, 45),
+          status: "completed" as RideStatus,
+          passengerName: "Robert Chen",
+          distance: 6.5
+        }
+      ];
+    case "driver3":
+      return [
+        ...baseRides,
+        {
+          id: "ride8",
+          pickupLocation: { address: "212 Airport Terminal" },
+          dropoffLocation: { address: "313 Hotel Plaza" },
+          fare: 45.75,
+          date: new Date(2025, 3, 21, 20, 0),
+          status: "completed",
+          passengerName: "Thomas Garcia",
+          distance: 12.3
+        },
+        {
+          id: "ride9",
+          pickupLocation: { address: "414 Conference Center" },
+          dropoffLocation: { address: "515 Business Park" },
+          fare: 32.25,
+          date: new Date(2025, 3, 21, 17, 30),
+          status: "completed",
+          passengerName: "Lisa Martinez",
+          distance: 9.8
+        }
+      ];
+    case "driver4":
+      return baseRides.slice(0, 3);
+    case "driver5":
+      return [
+        ...baseRides.slice(2),
+        {
+          id: "ride10",
+          pickupLocation: { address: "616 Shopping Mall" },
+          dropoffLocation: { address: "717 Residential Complex" },
+          fare: 19.50,
+          date: new Date(2025, 3, 21, 14, 0),
+          status: "completed",
+          passengerName: "Kevin Taylor",
+          distance: 5.7
+        }
+      ];
+    default:
+      return baseRides;
+  }
 };

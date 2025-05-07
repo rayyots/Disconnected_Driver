@@ -1,86 +1,62 @@
 
-import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { RideProvider } from '@/contexts/RideContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { RideProvider } from "@/contexts/RideContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
-// Import screens
-import LoginScreen from './screens/LoginScreen';
-import HomeScreen from './screens/HomeScreen';
-import EarningsScreen from './screens/EarningsScreen';
-import ProfileScreen from './screens/ProfileScreen';
+// Pages
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import EarningsPage from "./pages/EarningsPage";
+import ProfilePage from "./pages/ProfilePage";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthPage from "./pages/AuthPage";
 
-// Import icons
-import Ionicons from 'react-native-vector-icons/Ionicons';
+const queryClient = new QueryClient();
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-// Navigation for authenticated users
-function MainTabs() {
-  return (
-    <RideProvider>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner position="top-right" />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
             
-            if (route.name === 'Home') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Earnings') {
-              iconName = focused ? 'wallet' : 'wallet-outline';
-            } else if (route.name === 'Profile') {
-              iconName = focused ? 'person' : 'person-outline';
-            }
+            <Route path="/" element={
+              <ProtectedRoute>
+                <RideProvider>
+                  <HomePage />
+                </RideProvider>
+              </ProtectedRoute>
+            } />
             
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#00C4CC',
-          tabBarInactiveTintColor: 'gray',
-          tabBarStyle: { backgroundColor: '#1A252F' },
-          headerStyle: { backgroundColor: '#1A252F' },
-          headerTitleStyle: { color: 'white' },
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Earnings" component={EarningsScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
-    </RideProvider>
-  );
-}
+            <Route path="/earnings" element={
+              <ProtectedRoute>
+                <RideProvider>
+                  <EarningsPage />
+                </RideProvider>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
-// Main navigation container with auth flow
-function AppNavigator() {
-  const { isAuthenticated } = useAuth();
-
-  return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false
-        }}
-      >
-        {!isAuthenticated ? (
-          <Stack.Screen name="Login" component={LoginScreen} />
-        ) : (
-          <Stack.Screen name="Main" component={MainTabs} />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
-export default function App() {
-  return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <AppNavigator />
-      </AuthProvider>
-    </SafeAreaProvider>
-  );
-}
+export default App;

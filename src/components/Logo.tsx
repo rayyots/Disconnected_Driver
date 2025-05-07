@@ -1,54 +1,27 @@
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { cn } from '@/lib/utils';
 
 interface LogoProps {
+  className?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-const Logo: React.FC<LogoProps> = ({ size = 'md' }) => {
-  let height;
-  
-  switch (size) {
-    case 'sm':
-      height = 32; // 8 * 4 (h-8)
-      break;
-    case 'md':
-      height = 48; // 12 * 4 (h-12)
-      break;
-    case 'lg':
-      height = 96; // 24 * 4 (h-24)
-      break;
-    default:
-      height = 48;
-  }
-  
-  const fontSize = height * 0.42;
-  
+const Logo: React.FC<LogoProps> = ({ className, size = 'md' }) => {
+  const sizeClasses = {
+    sm: 'h-8',
+    md: 'h-12',
+    lg: 'h-24',
+  };
+
   return (
-    <View style={[styles.container, { height }]}>
-      <Text style={[styles.text, { fontSize }]}>
-        <Text style={styles.whiteText}>Disconnected</Text>
-        <Text style={styles.accentText}>Driver</Text>
-      </Text>
-    </View>
+    <div className={cn('flex items-center justify-center', className)}>
+      <div className={cn('font-bold text-white', sizeClasses[size])}>
+        <span className="text-white">Disconnected</span>
+        <span className="text-[#00C4CC]">Driver</span>
+      </div>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    fontWeight: 'bold',
-  },
-  whiteText: {
-    color: 'white',
-  },
-  accentText: {
-    color: '#00C4CC',
-  },
-});
 
 export default Logo;

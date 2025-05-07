@@ -1,56 +1,30 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, Switch } from 'react-native';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
 
 const DriverStatusToggle: React.FC = () => {
   const { driver, updateDriverStatus } = useAuth();
   
-  const handleStatusChange = (value: boolean) => {
-    updateDriverStatus(value);
+  const handleStatusChange = (checked: boolean) => {
+    updateDriverStatus(checked);
   };
   
   return (
-    <View style={styles.container}>
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>Driver Status</Text>
-        <Text style={styles.subtitle}>
+    <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700">
+      <div>
+        <p className="text-white font-medium">Driver Status</p>
+        <p className="text-sm text-gray-400">
           {driver?.isOnline ? 'You are online and can receive ride requests' : 'Go online to receive ride requests'}
-        </Text>
-      </View>
+        </p>
+      </div>
       <Switch 
-        value={driver?.isOnline || false}
-        onValueChange={handleStatusChange}
-        trackColor={{ false: '#374151', true: '#00C4CC' }}
-        thumbColor={'#ffffff'}
+        checked={driver?.isOnline || false}
+        onCheckedChange={handleStatusChange}
+        className="data-[state=checked]:bg-[#00C4CC]"
       />
-    </View>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#111827',
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#374151',
-  },
-  textContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: 'white',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#9ca3af',
-  },
-});
 
 export default DriverStatusToggle;

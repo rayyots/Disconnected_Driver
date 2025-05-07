@@ -1,14 +1,5 @@
+import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
 
-import { AppRegistry } from 'react-native';
-import App from './App';
-
-// Register the app
-AppRegistry.registerComponent('DisconnectedDriver', () => App);
-
-// Web support
-if (typeof document !== 'undefined') {
-  const rootTag = document.getElementById('root');
-  if (rootTag) {
-    AppRegistry.runApplication('DisconnectedDriver', { rootTag });
-  }
-}
+createRoot(document.getElementById("root")!).render(<App />);

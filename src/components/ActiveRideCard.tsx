@@ -1,29 +1,9 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
-interface Location {
-  address: string;
-  lat?: number;
-  lng?: number;
-}
-
-interface Rider {
-  name: string;
-  rating: number;
-}
-
-interface ActiveRide {
-  id: string;
-  pickupLocation: Location;
-  dropoffLocation: Location;
-  rider: Rider;
-  fare: number;
-  estimatedTime: number;
-  distance: number;
-  status: 'accepted' | 'arrived' | 'in_progress' | 'completed' | 'cancelled';
-}
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { ActiveRide } from '@/contexts/RideContext';
+import { Clock, Navigation, User, MapPin, Check } from 'lucide-react';
 
 interface ActiveRideCardProps {
   ride: ActiveRide;
@@ -45,46 +25,48 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
     switch (ride.status) {
       case 'accepted':
         return (
-          <View style={styles.actionButtons}>
-            <TouchableOpacity 
-              style={styles.cancelButton}
-              onPress={onCancelRide}
+          <>
+            <Button 
+              variant="outline" 
+              className="text-white border-gray-600 hover:bg-gray-700"
+              onClick={onCancelRide}
             >
-              <Text style={styles.cancelText}>Cancel Ride</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.primaryButton}
-              onPress={onArriveAtPickup}
+              Cancel Ride
+            </Button>
+            <Button 
+              className="bg-[#00C4CC] hover:bg-[#00A8AF] text-white"
+              onClick={onArriveAtPickup}
             >
-              <Text style={styles.primaryButtonText}>Arrived at Pickup</Text>
-            </TouchableOpacity>
-          </View>
+              Arrived at Pickup
+            </Button>
+          </>
         );
       case 'arrived':
         return (
-          <View style={styles.actionButtons}>
-            <TouchableOpacity 
-              style={styles.cancelButton}
-              onPress={onCancelRide}
+          <>
+            <Button 
+              variant="outline" 
+              className="text-white border-gray-600 hover:bg-gray-700"
+              onClick={onCancelRide}
             >
-              <Text style={styles.cancelText}>Cancel Ride</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.primaryButton}
-              onPress={onStartRide}
+              Cancel Ride
+            </Button>
+            <Button 
+              className="bg-[#00C4CC] hover:bg-[#00A8AF] text-white"
+              onClick={onStartRide}
             >
-              <Text style={styles.primaryButtonText}>Start Ride</Text>
-            </TouchableOpacity>
-          </View>
+              Start Ride
+            </Button>
+          </>
         );
       case 'in_progress':
         return (
-          <TouchableOpacity 
-            style={styles.completeButton}
-            onPress={onCompleteRide}
+          <Button 
+            className="w-full bg-[#00C4CC] hover:bg-[#00A8AF] text-white"
+            onClick={onCompleteRide}
           >
-            <Text style={styles.primaryButtonText}>Complete Ride</Text>
-          </TouchableOpacity>
+            Complete Ride
+          </Button>
         );
       default:
         return null;
@@ -111,218 +93,62 @@ const ActiveRideCard: React.FC<ActiveRideCardProps> = ({
   const highlightPickup = ride.status === 'accepted';
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>{getStatusHeader()}</Text>
-        <Text style={styles.fareText}>EGP {ride.fare.toFixed(2)}</Text>
-      </View>
+    <Card className="w-full bg-gray-800 border-gray-700 overflow-hidden">
+      <div className="bg-[#00C4CC] p-3 flex justify-between items-center">
+        <h3 className="font-medium text-white">{getStatusHeader()}</h3>
+        <div className="text-white font-bold">${ride.fare.toFixed(2)}</div>
+      </div>
       
-      <View style={styles.content}>
-        <View style={styles.userInfo}>
-          <View style={styles.userIcon}>
-            <Ionicons name="person" size={20} color="#00C4CC" />
-          </View>
-          <View>
-            <Text style={styles.userName}>{ride.rider.name}</Text>
-            <Text style={styles.userRating}>Rating: {ride.rider.rating}★</Text>
-          </View>
-        </View>
+      <CardContent className="p-4">
+        <div className="flex items-center mb-4">
+          <div className="bg-gray-700 p-2 rounded-full mr-3">
+            <User className="h-5 w-5 text-[#00C4CC]" />
+          </div>
+          <div>
+            <h3 className="font-medium text-white">{ride.rider.name}</h3>
+            <div className="text-sm text-gray-400">Rating: {ride.rider.rating}★</div>
+          </div>
+        </div>
         
-        <View style={styles.locations}>
-          <View style={[
-            styles.locationRow, 
-            highlightPickup && styles.highlightedLocation
-          ]}>
-            <View style={styles.locationDot}>
-              <View style={styles.pickupDot} />
-            </View>
-            <View>
-              <Text style={styles.locationLabel}>Pickup</Text>
-              <Text style={styles.locationAddress}>{ride.pickupLocation.address}</Text>
-            </View>
-          </View>
+        <div className="space-y-3 mb-4">
+          <div className={`flex items-start ${highlightPickup ? 'bg-gray-700/30 p-2 rounded' : ''}`}>
+            <div className="min-w-8 flex justify-center pt-1">
+              <div className="h-2 w-2 rounded-full bg-green-500"></div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-400">Pickup</div>
+              <div className="text-white">{ride.pickupLocation.address}</div>
+            </div>
+          </div>
           
-          <View style={[
-            styles.locationRow, 
-            !highlightPickup && styles.highlightedLocation
-          ]}>
-            <View style={styles.locationDot}>
-              <View style={styles.dropoffDot} />
-            </View>
-            <View>
-              <Text style={styles.locationLabel}>Dropoff</Text>
-              <Text style={styles.locationAddress}>{ride.dropoffLocation.address}</Text>
-            </View>
-          </View>
-        </View>
+          <div className={`flex items-start ${!highlightPickup ? 'bg-gray-700/30 p-2 rounded' : ''}`}>
+            <div className="min-w-8 flex justify-center pt-1">
+              <div className="h-2 w-2 rounded-full bg-red-500"></div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-400">Dropoff</div>
+              <div className="text-white">{ride.dropoffLocation.address}</div>
+            </div>
+          </div>
+        </div>
         
-        <View style={styles.footer}>
-          <View style={styles.timeInfo}>
-            <Ionicons name="time-outline" size={16} color="#9ca3af" />
-            <Text style={styles.timeText}>{ride.estimatedTime} mins</Text>
-          </View>
-          <View style={styles.distanceInfo}>
-            <Ionicons name="navigate-outline" size={16} color="#9ca3af" />
-            <Text style={styles.distanceText}>{ride.distance.toFixed(1)} km</Text>
-          </View>
-        </View>
-      </View>
+        <div className="flex justify-between text-sm text-gray-400">
+          <div className="flex items-center">
+            <Clock className="h-4 w-4 mr-1" />
+            <span>{ride.estimatedTime} mins</span>
+          </div>
+          <div className="flex items-center">
+            <Navigation className="h-4 w-4 mr-1" />
+            <span>{ride.distance.toFixed(1)} mi</span>
+          </div>
+        </div>
+      </CardContent>
       
-      <View style={styles.actions}>
+      <CardFooter className="bg-gray-900 p-3 flex justify-between gap-3">
         {renderActionButtons()}
-      </View>
-    </View>
+      </CardFooter>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#111827',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#374151',
-    overflow: 'hidden',
-  },
-  header: {
-    backgroundColor: '#00C4CC',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: 'white',
-  },
-  fareText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  content: {
-    padding: 16,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  userIcon: {
-    backgroundColor: '#1f2937',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: 'white',
-  },
-  userRating: {
-    fontSize: 14,
-    color: '#9ca3af',
-  },
-  locations: {
-    marginBottom: 16,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    borderRadius: 4,
-  },
-  highlightedLocation: {
-    backgroundColor: 'rgba(31, 41, 55, 0.5)', // gray-700 with opacity
-  },
-  locationDot: {
-    width: 32,
-    alignItems: 'center',
-    paddingTop: 4,
-  },
-  pickupDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#10b981', // green-500
-  },
-  dropoffDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ef4444', // red-500
-  },
-  locationLabel: {
-    fontSize: 14,
-    color: '#9ca3af',
-  },
-  locationAddress: {
-    fontSize: 14,
-    color: 'white',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  timeInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  timeText: {
-    fontSize: 14,
-    color: '#9ca3af',
-    marginLeft: 4,
-  },
-  distanceInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  distanceText: {
-    fontSize: 14,
-    color: '#9ca3af',
-    marginLeft: 4,
-  },
-  actions: {
-    backgroundColor: '#1f2937',
-    padding: 12,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-  },
-  cancelButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#4b5563',
-    borderRadius: 6,
-    padding: 12,
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  cancelText: {
-    color: 'white',
-    fontWeight: '500',
-  },
-  primaryButton: {
-    flex: 1,
-    backgroundColor: '#00C4CC',
-    borderRadius: 6,
-    padding: 12,
-    alignItems: 'center',
-  },
-  completeButton: {
-    backgroundColor: '#00C4CC',
-    borderRadius: 6,
-    padding: 12,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: 'white',
-    fontWeight: '500',
-  },
-});
 
 export default ActiveRideCard;
